@@ -70,4 +70,6 @@ gradle-app.setting
 /backend/out
 
 /config/application.properties
+/config/test.properties
 /backend/config/application.properties
+/backend/config/test.properties
