@@ -9,5 +9,5 @@ import org.springframework.test.context.TestPropertySource
 
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
-@TestPropertySource(locations = ["file:./config/test.properties"])
+@TestPropertySource(locations = ["file:./src/test/config/test.properties"])
 annotation class DefaultTestPropertiesSource
