@@ -16,8 +16,12 @@ import java.security.MessageDigest
 @Service
 class UserServiceTtrss(private val jdbcTemplate: JdbcTemplate) {
 
-    fun checkPassword(login: String, password: String): User? {
-        class CheckPasswordRSRow(val id: Long, val pwdHash: String, val salt: String)
+    private class CheckPasswordRSRow(val id: Long, val pwdHash: String, val salt: String)
+
+    fun checkPassword(loginArg: String?, passwordArg: String?): User? {
+
+        val login = loginArg?.trim() ?: ""
+        val password = passwordArg ?: ""
 
         val mapper = RowMapper { rs, _ ->
             CheckPasswordRSRow(rs.getLong("id"), rs.getString("pwd_hash") ?: "", rs.getString("salt") ?: "")
