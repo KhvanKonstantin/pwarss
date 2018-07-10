@@ -11,3 +11,6 @@ data class NewsEntry(val id: Long,
                      val title: String,
                      val date: Date,
                      val content: String)
+
+
+val EMPTY_ENTRY = NewsEntry(1, true, false, "", "", Date(0), "")
