@@ -7,6 +7,6 @@ import org.springframework.stereotype.Component
 
 @Component
 @ConfigurationProperties("pwarss")
-class PwaRssConfiguration {
+class PwaRssProperties {
     var maxEntriesForRequest = 500
 }

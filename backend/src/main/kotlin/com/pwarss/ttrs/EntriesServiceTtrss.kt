@@ -2,9 +2,8 @@
 
 package com.pwarss.ttrs
 
-import com.pwarss.PwaRssConfiguration
+import com.pwarss.PwaRssProperties
 import com.pwarss.model.NewsEntry
-import org.springframework.dao.DataRetrievalFailureException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Service
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Service
  * tt-rss db based entries repository
  */
 @Service
-class EntriesServiceTtrss(private val jdbcTemplate: JdbcTemplate, config: PwaRssConfiguration) {
+class EntriesServiceTtrss(private val jdbcTemplate: JdbcTemplate, config: PwaRssProperties) {
 
     val maxEntries = config.maxEntriesForRequest
 
@@ -27,7 +26,7 @@ class EntriesServiceTtrss(private val jdbcTemplate: JdbcTemplate, config: PwaRss
                 rs.getString("content"))
     }
 
-    fun findEntryById(ownerId: Long, entryId: Long): NewsEntry {
+    fun findEntryById(ownerId: Long, entryId: Long): NewsEntry? {
         val query = """SELECT e.id           AS id,
                               ue.unread      AS unread,
                               ue.marked      AS marked,
@@ -41,7 +40,6 @@ class EntriesServiceTtrss(private val jdbcTemplate: JdbcTemplate, config: PwaRss
                          AND ue.ref_id = ?"""
 
         return jdbcTemplate.queryForObject(query, newsEntryMapper, ownerId, entryId)
-                ?: throw DataRetrievalFailureException("No entry $entryId not found")
     }
 
     fun listLastEntries(ownerId: Long, limit: Int): List<NewsEntry> {

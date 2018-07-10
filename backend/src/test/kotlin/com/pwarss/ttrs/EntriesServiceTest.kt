@@ -56,10 +56,10 @@ class EntriesServiceTest {
 
         entriesService.markEntry(ownerId, latestEntry.id, true)
 
-        assertThat(entriesService.findEntryById(ownerId, latestEntry.id).marked).isTrue()
+        assertThat(entriesService.findEntryById(ownerId, latestEntry.id)?.marked).isTrue()
 
         entriesService.markEntry(ownerId, latestEntry.id, false)
-        assertThat(entriesService.findEntryById(ownerId, latestEntry.id).marked).isFalse()
+        assertThat(entriesService.findEntryById(ownerId, latestEntry.id)?.marked).isFalse()
     }
 
     @Test
@@ -67,9 +67,9 @@ class EntriesServiceTest {
         val latestEntry = entriesService.listLastEntries(ownerId, 10).first()
 
         entriesService.markEntryRead(ownerId, latestEntry.id, true)
-        assertThat(entriesService.findEntryById(ownerId, latestEntry.id).read).isTrue()
+        assertThat(entriesService.findEntryById(ownerId, latestEntry.id)?.read).isTrue()
 
         entriesService.markEntryRead(ownerId, latestEntry.id, false)
-        assertThat(entriesService.findEntryById(ownerId, latestEntry.id).read).isFalse()
+        assertThat(entriesService.findEntryById(ownerId, latestEntry.id)?.read).isFalse()
     }
 }
