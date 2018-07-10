@@ -22,7 +22,6 @@ import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import javax.servlet.http.HttpSession
 
 
 @RunWith(SpringRunner::class)
@@ -40,9 +39,6 @@ class AuthenticationControllerTest {
     @MockBean
     lateinit var userService: UserServiceTtrss
 
-    private fun HttpSession?.authentication() = this?.getAttribute("scopedTarget.sessionAuthentication") as? SessionAuthentication
-    private fun HttpSession?.user() = this?.authentication()?.user?.get()
-
     @Test
     fun loginFailureEmpty() {
         Mockito.doReturn(null).`when`(userService).checkPassword(Mockito.anyString(), Mockito.anyString())
@@ -57,7 +53,7 @@ class AuthenticationControllerTest {
         mockMvc.perform(post("/login")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(objectMapper.writeValueAsString(mapOf("login" to "", "password" to ""))))
-                .andExpect(MockMvcResultMatchers.status().isUnauthorized)
+                .andExpect(MockMvcResultMatchers.status().isForbidden)
                 .andDo {
                     assertThat(it.request.session?.user()).isNull()
                 }
@@ -69,11 +65,12 @@ class AuthenticationControllerTest {
     fun loginSuccess() {
         val user = User(1, "login")
 
-        Mockito.doReturn(user).`when`(userService).checkPassword(user.login, "password")
+        val password = "password"
+        Mockito.doReturn(user).`when`(userService).checkPassword(user.login, password)
 
         mockMvc.perform(post("/login")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(objectMapper.writeValueAsString(mapOf("login" to user.login, "password" to "password"))))
+                .content(objectMapper.writeValueAsString(mapOf("login" to user.login, "password" to password))))
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(user)))
                 .andDo {

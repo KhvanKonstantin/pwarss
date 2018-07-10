@@ -20,7 +20,7 @@ class AuthenticationController(val userService: UserServiceTtrss, val authentica
         val user = userService.checkPassword(loginRequest.login, loginRequest.password)
 
         return when (user) {
-            null -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\":\"UNAUTHORIZED\"}")
+            null -> ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\"error\":\"FORBIDDEN\"}")
             else -> {
                 authentication.user.set(user)
                 ResponseEntity.ok(user)
