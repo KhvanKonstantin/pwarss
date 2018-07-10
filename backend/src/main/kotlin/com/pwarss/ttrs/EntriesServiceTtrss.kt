@@ -2,6 +2,7 @@
 
 package com.pwarss.ttrs
 
+import com.pwarss.PwaRssConfiguration
 import com.pwarss.model.NewsEntry
 import org.springframework.dao.DataRetrievalFailureException
 import org.springframework.jdbc.core.JdbcTemplate
@@ -12,7 +13,9 @@ import org.springframework.stereotype.Service
  * tt-rss db based entries repository
  */
 @Service
-class EntriesServiceTtrss(private val jdbcTemplate: JdbcTemplate) {
+class EntriesServiceTtrss(private val jdbcTemplate: JdbcTemplate, config: PwaRssConfiguration) {
+
+    val maxEntries = config.maxEntriesForRequest
 
     private val newsEntryMapper = RowMapper { rs, _ ->
         NewsEntry(rs.getLong("id"),
@@ -42,7 +45,7 @@ class EntriesServiceTtrss(private val jdbcTemplate: JdbcTemplate) {
     }
 
     fun listLastEntries(ownerId: Long, limit: Int): List<NewsEntry> {
-        val limit = limit.coerceIn(10, 500)
+        val limit = limit.coerceIn(10, maxEntries)
 
         val query = """SELECT e.id           AS id,
                               ue.unread      AS unread,
@@ -61,7 +64,7 @@ class EntriesServiceTtrss(private val jdbcTemplate: JdbcTemplate) {
     }
 
     fun listLastUnreadEntries(ownerId: Long, limit: Int): List<NewsEntry> {
-        val limit = limit.coerceIn(10, 500)
+        val limit = limit.coerceIn(10, maxEntries)
 
         val query = """SELECT e.id           AS id,
                               ue.unread      AS unread,
@@ -81,7 +84,7 @@ class EntriesServiceTtrss(private val jdbcTemplate: JdbcTemplate) {
     }
 
     fun listLastMarkedEntries(ownerId: Long, limit: Int): List<NewsEntry> {
-        val limit = limit.coerceIn(10, 500)
+        val limit = limit.coerceIn(10, maxEntries)
 
         val query = """SELECT e.id           AS id,
                               ue.unread      AS unread,
