@@ -5,7 +5,7 @@ package com.pwarss.ttrs
 import com.pwarss.PwarssApplication
 import com.pwarss.testutil.DefaultTestPropertiesSource
 import com.pwarss.testutil.TestProperties
-import org.junit.Assert
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -40,7 +40,7 @@ class EntriesServiceTest {
     fun listLastEntries() {
         val entries = entriesService.listLastEntries(ownerId, 50)
 
-        Assert.assertTrue(entries.isNotEmpty())
+        assertThat(entries.isNotEmpty()).isTrue()
     }
 
     @Test
@@ -55,10 +55,11 @@ class EntriesServiceTest {
         val latestEntry = entriesService.listLastEntries(ownerId, 10).first()
 
         entriesService.markEntry(ownerId, latestEntry.id, true)
-        Assert.assertTrue(entriesService.findEntryById(ownerId, latestEntry.id).marked)
+
+        assertThat(entriesService.findEntryById(ownerId, latestEntry.id).marked).isTrue()
 
         entriesService.markEntry(ownerId, latestEntry.id, false)
-        Assert.assertFalse(entriesService.findEntryById(ownerId, latestEntry.id).marked)
+        assertThat(entriesService.findEntryById(ownerId, latestEntry.id).marked).isFalse()
     }
 
     @Test
@@ -66,9 +67,9 @@ class EntriesServiceTest {
         val latestEntry = entriesService.listLastEntries(ownerId, 10).first()
 
         entriesService.markEntryRead(ownerId, latestEntry.id, true)
-        Assert.assertTrue(entriesService.findEntryById(ownerId, latestEntry.id).read)
+        assertThat(entriesService.findEntryById(ownerId, latestEntry.id).read).isTrue()
 
         entriesService.markEntryRead(ownerId, latestEntry.id, false)
-        Assert.assertFalse(entriesService.findEntryById(ownerId, latestEntry.id).read)
+        assertThat(entriesService.findEntryById(ownerId, latestEntry.id).read).isFalse()
     }
 }
