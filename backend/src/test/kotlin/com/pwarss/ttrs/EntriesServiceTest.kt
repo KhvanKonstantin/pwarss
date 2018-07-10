@@ -37,22 +37,22 @@ class EntriesServiceTest {
     }
 
     @Test
-    fun listLastEntries() {
-        val entries = entriesService.listLastEntries(ownerId, 50)
+    fun findEntries() {
+        val entries = entriesService.findEntries(ownerId, 50)
 
         assertThat(entries.isNotEmpty()).isTrue()
     }
 
     @Test
-    fun runAllLists() {
-        entriesService.listLastEntries(ownerId, 50)
-        entriesService.listLastMarkedEntries(ownerId, 50)
-        entriesService.listLastUnreadEntries(ownerId, 50)
+    fun runAllFinds() {
+        entriesService.findEntries(ownerId, 50)
+        entriesService.findMarked(ownerId, 50)
+        entriesService.findUnread(ownerId, 50)
     }
 
     @Test
     fun markEntry() {
-        val latestEntry = entriesService.listLastEntries(ownerId, 10).first()
+        val latestEntry = entriesService.findEntries(ownerId, 10).first()
 
         entriesService.markEntry(ownerId, latestEntry.id, true)
 
@@ -64,7 +64,7 @@ class EntriesServiceTest {
 
     @Test
     fun markEntryRead() {
-        val latestEntry = entriesService.listLastEntries(ownerId, 10).first()
+        val latestEntry = entriesService.findEntries(ownerId, 10).first()
 
         entriesService.markEntryRead(ownerId, latestEntry.id, true)
         assertThat(entriesService.findEntryById(ownerId, latestEntry.id)?.read).isTrue()

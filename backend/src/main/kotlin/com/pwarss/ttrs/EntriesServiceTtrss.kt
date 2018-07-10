@@ -42,7 +42,7 @@ class EntriesServiceTtrss(private val jdbcTemplate: JdbcTemplate, config: PwaRss
         return jdbcTemplate.queryForObject(query, newsEntryMapper, ownerId, entryId)
     }
 
-    fun listLastEntries(ownerId: Long, limit: Int): List<NewsEntry> {
+    fun findEntries(ownerId: Long, limit: Int): List<NewsEntry> {
         val limit = limit.coerceIn(10, maxEntries)
 
         val query = """SELECT e.id           AS id,
@@ -61,7 +61,7 @@ class EntriesServiceTtrss(private val jdbcTemplate: JdbcTemplate, config: PwaRss
         return jdbcTemplate.query(query, newsEntryMapper, ownerId, limit)
     }
 
-    fun listLastUnreadEntries(ownerId: Long, limit: Int): List<NewsEntry> {
+    fun findUnread(ownerId: Long, limit: Int): List<NewsEntry> {
         val limit = limit.coerceIn(10, maxEntries)
 
         val query = """SELECT e.id           AS id,
@@ -81,7 +81,7 @@ class EntriesServiceTtrss(private val jdbcTemplate: JdbcTemplate, config: PwaRss
         return jdbcTemplate.query(query, newsEntryMapper, ownerId, limit)
     }
 
-    fun listLastMarkedEntries(ownerId: Long, limit: Int): List<NewsEntry> {
+    fun findMarked(ownerId: Long, limit: Int): List<NewsEntry> {
         val limit = limit.coerceIn(10, maxEntries)
 
         val query = """SELECT e.id           AS id,

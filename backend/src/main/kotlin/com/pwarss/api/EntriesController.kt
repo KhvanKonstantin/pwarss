@@ -25,19 +25,19 @@ class EntriesController(private val entriesServiceTtrss: EntriesServiceTtrss) {
 
     @GetMapping("/entries")
     fun findEntries(user: User): ResponseEntity<List<NewsEntry>> {
-        val entries = entriesServiceTtrss.listLastEntries(user.id, 500)
+        val entries = entriesServiceTtrss.findEntries(user.id, 500)
         return ResponseEntity.ok(entries)
     }
 
     @GetMapping("/unread")
     fun findUnread(user: User): ResponseEntity<List<NewsEntry>> {
-        val entries = entriesServiceTtrss.listLastUnreadEntries(user.id, 500)
+        val entries = entriesServiceTtrss.findUnread(user.id, 500)
         return ResponseEntity.ok(entries)
     }
 
     @GetMapping("/marked")
     fun findMarked(user: User): ResponseEntity<List<NewsEntry>> {
-        val entries = entriesServiceTtrss.listLastMarkedEntries(user.id, 500)
+        val entries = entriesServiceTtrss.findMarked(user.id, 500)
         return ResponseEntity.ok(entries)
     }
 }

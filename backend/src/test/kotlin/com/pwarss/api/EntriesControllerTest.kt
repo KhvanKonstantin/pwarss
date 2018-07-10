@@ -86,7 +86,7 @@ class EntriesControllerTest {
         val (session, user) = doLogin()
 
         val entries = listOf(EMPTY_ENTRY)
-        Mockito.doReturn(entries).`when`(entriesService).listLastEntries(Mockito.eq(user.id), Mockito.anyInt())
+        Mockito.doReturn(entries).`when`(entriesService).findEntries(Mockito.eq(user.id), Mockito.anyInt())
 
         mockMvc.perform(get("/entries").session(session))
                 .andExpect(status().isOk)
@@ -98,7 +98,7 @@ class EntriesControllerTest {
         val (session, user) = doLogin()
 
         val entries = listOf(EMPTY_ENTRY)
-        Mockito.doReturn(entries).`when`(entriesService).listLastUnreadEntries(Mockito.eq(user.id), Mockito.anyInt())
+        Mockito.doReturn(entries).`when`(entriesService).findUnread(Mockito.eq(user.id), Mockito.anyInt())
 
         mockMvc.perform(get("/unread").session(session))
                 .andExpect(status().isOk)
@@ -110,7 +110,7 @@ class EntriesControllerTest {
         val (session, user) = doLogin()
 
         val entries = listOf(EMPTY_ENTRY)
-        Mockito.doReturn(entries).`when`(entriesService).listLastMarkedEntries(Mockito.eq(user.id), Mockito.anyInt())
+        Mockito.doReturn(entries).`when`(entriesService).findMarked(Mockito.eq(user.id), Mockito.anyInt())
 
         mockMvc.perform(get("/marked").session(session))
                 .andExpect(status().isOk)
