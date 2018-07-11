@@ -1,0 +1,19 @@
+plugins {
+    id "com.moowork.node" version "1.2.0"
+}
+
+//apply plugin: 'base'
+version '1.0'
+
+buildDir = 'build'
+
+node {
+    version = '8.11.3'
+    download = true
+}
+
+task devStart(type: YarnTask) {
+    args = ["start"]
+}
+
+
