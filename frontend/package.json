@@ -1,7 +1,9 @@
 {
   "name": "pwarss",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.0.1",
+  "author": "Konstantin Khvan",
+  "homepage": "https://github.com/KhvanKonstantin/pwarss",
+  "license": "Apache-2.0",
   "dependencies": {
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
