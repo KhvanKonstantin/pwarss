@@ -12,8 +12,10 @@ node {
     download = true
 }
 
-task devStart(type: YarnTask) {
-    args = ["start"]
+task cleanFrontend(type: Delete) {
+    delete "./build"
 }
 
-
+task buildFrontend(type: YarnTask) {
+    args = ["build"]
+}
