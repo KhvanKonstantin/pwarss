@@ -43,14 +43,14 @@ class AuthenticationControllerTest {
     fun loginFailureEmpty() {
         Mockito.doReturn(null).`when`(userService).checkPassword(Mockito.anyString(), Mockito.anyString())
 
-        mockMvc.perform(post("/login")
+        mockMvc.perform(post("/api/login")
                 .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andDo {
                     assertThat(it.request.session?.user()).isNull()
                 }
 
-        mockMvc.perform(post("/login")
+        mockMvc.perform(post("/api/login")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(objectMapper.writeValueAsString(mapOf("login" to "", "password" to ""))))
                 .andExpect(MockMvcResultMatchers.status().isForbidden)
@@ -68,7 +68,7 @@ class AuthenticationControllerTest {
         val password = "password"
         Mockito.doReturn(user).`when`(userService).checkPassword(user.login, password)
 
-        mockMvc.perform(post("/login")
+        mockMvc.perform(post("/api/login")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(objectMapper.writeValueAsString(mapOf("login" to user.login, "password" to password))))
                 .andExpect(MockMvcResultMatchers.status().isOk)
@@ -83,7 +83,7 @@ class AuthenticationControllerTest {
 
     @Test
     fun logout() {
-        mockMvc.perform(post("/logout")
+        mockMvc.perform(post("/api/logout")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andDo {

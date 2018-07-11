@@ -49,7 +49,7 @@ class EntriesControllerTest {
 
         val session = MockHttpSession()
 
-        mockMvc.perform(post("/login")
+        mockMvc.perform(post("/api/login")
                 .session(session)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(objectMapper.writeValueAsString(mapOf("login" to user.login, "password" to password))))
@@ -60,10 +60,10 @@ class EntriesControllerTest {
 
     @Test
     fun checkAccessIsForbiddenWithoutLogin() {
-        mockMvc.perform(get("/entries/0")).andExpect(status().isForbidden)
-        mockMvc.perform(get("/entries")).andExpect(status().isForbidden)
-        mockMvc.perform(get("/unread")).andExpect(status().isForbidden)
-        mockMvc.perform(get("/marked")).andExpect(status().isForbidden)
+        mockMvc.perform(get("/api/entries/0")).andExpect(status().isForbidden)
+        mockMvc.perform(get("/api/entries")).andExpect(status().isForbidden)
+        mockMvc.perform(get("/api/unread")).andExpect(status().isForbidden)
+        mockMvc.perform(get("/api/marked")).andExpect(status().isForbidden)
     }
 
     @Test
@@ -73,10 +73,10 @@ class EntriesControllerTest {
         Mockito.doReturn(null).`when`(entriesService).findEntryById(user.id, 0)
         Mockito.doReturn(EMPTY_ENTRY).`when`(entriesService).findEntryById(user.id, 1)
 
-        mockMvc.perform(get("/entries/0").session(session))
+        mockMvc.perform(get("/api/entries/0").session(session))
                 .andExpect(status().isNotFound)
 
-        mockMvc.perform(get("/entries/1").session(session))
+        mockMvc.perform(get("/api/entries/1").session(session))
                 .andExpect(status().isOk)
                 .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(EMPTY_ENTRY)))
     }
@@ -88,7 +88,7 @@ class EntriesControllerTest {
         val entries = listOf(EMPTY_ENTRY)
         Mockito.doReturn(entries).`when`(entriesService).findEntries(Mockito.eq(user.id), Mockito.anyInt())
 
-        mockMvc.perform(get("/entries").session(session))
+        mockMvc.perform(get("/api/entries").session(session))
                 .andExpect(status().isOk)
                 .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(entries)))
     }
@@ -100,7 +100,7 @@ class EntriesControllerTest {
         val entries = listOf(EMPTY_ENTRY)
         Mockito.doReturn(entries).`when`(entriesService).findUnread(Mockito.eq(user.id), Mockito.anyInt())
 
-        mockMvc.perform(get("/unread").session(session))
+        mockMvc.perform(get("/api/unread").session(session))
                 .andExpect(status().isOk)
                 .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(entries)))
     }
@@ -112,7 +112,7 @@ class EntriesControllerTest {
         val entries = listOf(EMPTY_ENTRY)
         Mockito.doReturn(entries).`when`(entriesService).findMarked(Mockito.eq(user.id), Mockito.anyInt())
 
-        mockMvc.perform(get("/marked").session(session))
+        mockMvc.perform(get("/api/marked").session(session))
                 .andExpect(status().isOk)
                 .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(entries)))
     }

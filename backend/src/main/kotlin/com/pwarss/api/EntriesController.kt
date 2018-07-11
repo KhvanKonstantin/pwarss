@@ -7,14 +7,13 @@ import com.pwarss.model.User
 import com.pwarss.ttrs.EntriesServiceTtrss
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 /**
  * REST controller for NewsEntry query and update commands
  */
-@RestController
+@RestController()
+@RequestMapping("/api")
 class EntriesController(private val entriesService: EntriesServiceTtrss) {
 
     @GetMapping("/entries/{id}")
@@ -27,20 +26,20 @@ class EntriesController(private val entriesService: EntriesServiceTtrss) {
     }
 
     @GetMapping("/entries")
-    fun findEntries(user: User): ResponseEntity<List<NewsEntry>> {
-        val entries = entriesService.findEntries(user.id, 500)
+    fun findEntries(@RequestParam("limit", required = false, defaultValue = "500") limit: Int, user: User): ResponseEntity<List<NewsEntry>> {
+        val entries = entriesService.findEntries(user.id, limit)
         return ResponseEntity.ok(entries)
     }
 
     @GetMapping("/unread")
-    fun findUnread(user: User): ResponseEntity<List<NewsEntry>> {
-        val entries = entriesService.findUnread(user.id, 500)
+    fun findUnread(@RequestParam("limit", required = false, defaultValue = "500") limit: Int, user: User): ResponseEntity<List<NewsEntry>> {
+        val entries = entriesService.findUnread(user.id, limit)
         return ResponseEntity.ok(entries)
     }
 
     @GetMapping("/marked")
-    fun findMarked(user: User): ResponseEntity<List<NewsEntry>> {
-        val entries = entriesService.findMarked(user.id, 500)
+    fun findMarked(@RequestParam("limit", required = false, defaultValue = "500") limit: Int, user: User): ResponseEntity<List<NewsEntry>> {
+        val entries = entriesService.findMarked(user.id, limit)
         return ResponseEntity.ok(entries)
     }
 }
