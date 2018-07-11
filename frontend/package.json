@@ -2,8 +2,11 @@
   "name": "pwarss",
   "version": "0.0.1",
   "author": "Konstantin Khvan",
-  "homepage": "https://github.com/KhvanKonstantin/pwarss",
   "license": "Apache-2.0",
+
+  "repository": "https://github.com/KhvanKonstantin/pwarss",
+  "bugs": "https://github.com/KhvanKonstantin/pwarss/issues",
+
   "dependencies": {
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
