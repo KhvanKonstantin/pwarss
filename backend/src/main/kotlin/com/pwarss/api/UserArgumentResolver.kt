@@ -9,7 +9,11 @@ import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.method.support.ModelAndViewContainer
 
-
+/**
+ * Helper class resolving arguments of type User in spring controllers methods
+ *
+ * Requires SessionAuthentication to contain User object which indicates successful login
+ */
 class UserArgumentResolver : HandlerMethodArgumentResolver {
     override fun supportsParameter(parameter: MethodParameter?) = User::class.java == parameter?.parameterType
 

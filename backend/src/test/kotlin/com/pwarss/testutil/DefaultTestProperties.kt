@@ -6,7 +6,11 @@ package com.pwarss.testutil
 
 import org.springframework.test.context.TestPropertySource
 
-
+/**
+ * Common annotation for additional properties file to be used in tests specifically
+ *
+ * Encapsulates actual path to properties file
+ */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
 @TestPropertySource(locations = ["file:./src/test/config/test.properties"])

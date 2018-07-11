@@ -2,4 +2,7 @@
 
 package com.pwarss.api
 
+/**
+ * This exception should be thrown when request is not authenticated
+ */
 class AccessForbiddenException : RuntimeException("FORBIDDEN")

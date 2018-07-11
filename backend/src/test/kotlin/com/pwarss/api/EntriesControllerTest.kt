@@ -59,7 +59,7 @@ class EntriesControllerTest {
     }
 
     @Test
-    fun checkUserIsLoggedIn() {
+    fun checkAccessIsForbiddenWithoutLogin() {
         mockMvc.perform(get("/entries/0")).andExpect(status().isForbidden)
         mockMvc.perform(get("/entries")).andExpect(status().isForbidden)
         mockMvc.perform(get("/unread")).andExpect(status().isForbidden)

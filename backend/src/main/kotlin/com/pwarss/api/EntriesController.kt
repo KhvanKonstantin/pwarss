@@ -11,12 +11,15 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * REST controller for NewsEntry query and update commands
+ */
 @RestController
-class EntriesController(private val entriesServiceTtrss: EntriesServiceTtrss) {
+class EntriesController(private val entriesService: EntriesServiceTtrss) {
 
     @GetMapping("/entries/{id}")
     fun findById(@PathVariable("id") id: Long, user: User): ResponseEntity<*> {
-        val entry = entriesServiceTtrss.findEntryById(user.id, id)
+        val entry = entriesService.findEntryById(user.id, id)
         return when (entry) {
             null -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null)
             else -> ResponseEntity.ok(entry)
@@ -25,19 +28,19 @@ class EntriesController(private val entriesServiceTtrss: EntriesServiceTtrss) {
 
     @GetMapping("/entries")
     fun findEntries(user: User): ResponseEntity<List<NewsEntry>> {
-        val entries = entriesServiceTtrss.findEntries(user.id, 500)
+        val entries = entriesService.findEntries(user.id, 500)
         return ResponseEntity.ok(entries)
     }
 
     @GetMapping("/unread")
     fun findUnread(user: User): ResponseEntity<List<NewsEntry>> {
-        val entries = entriesServiceTtrss.findUnread(user.id, 500)
+        val entries = entriesService.findUnread(user.id, 500)
         return ResponseEntity.ok(entries)
     }
 
     @GetMapping("/marked")
     fun findMarked(user: User): ResponseEntity<List<NewsEntry>> {
-        val entries = entriesServiceTtrss.findMarked(user.id, 500)
+        val entries = entriesService.findMarked(user.id, 500)
         return ResponseEntity.ok(entries)
     }
 }

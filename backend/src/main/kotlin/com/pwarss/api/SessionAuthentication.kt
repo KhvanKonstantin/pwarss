@@ -10,6 +10,9 @@ import org.springframework.web.context.request.RequestAttributes
 import java.util.concurrent.atomic.AtomicReference
 import javax.servlet.http.HttpSession
 
+/**
+ * Session bound component with logged in user info (if one is logged in)
+ */
 @Component
 @SessionScope
 class SessionAuthentication {

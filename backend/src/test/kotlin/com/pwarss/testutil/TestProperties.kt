@@ -9,6 +9,11 @@ package com.pwarss.testutil
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
 
+/**
+ * Definition of additional test properties
+ *
+ * @see DefaultTestPropertiesSource
+ */
 @Component
 @ConfigurationProperties("pwarsstest")
 class TestProperties {

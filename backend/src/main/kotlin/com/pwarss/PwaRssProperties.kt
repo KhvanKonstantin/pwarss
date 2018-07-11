@@ -5,6 +5,11 @@ package com.pwarss
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
 
+/**
+ * Definition of application preferences
+ *
+ * Set them in /config/application.properties
+ */
 @Component
 @ConfigurationProperties("pwarss")
 class PwaRssProperties {

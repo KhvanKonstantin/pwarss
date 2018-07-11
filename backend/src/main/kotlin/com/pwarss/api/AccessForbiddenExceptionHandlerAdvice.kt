@@ -8,10 +8,14 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 
 
+val RESPONSE_FORBIDDEN: ResponseEntity<String> = ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\"error\":\"FORBIDDEN\"}")
+
+/**
+ * Global controller handler for AccessForbiddenException that returns generic json error with HTTP 403 code
+ */
 @ControllerAdvice
 class AccessForbiddenExceptionHandlerAdvice {
-    private val responseForbidden = ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\"error\":\"FORBIDDEN\"}")
 
     @ExceptionHandler(AccessForbiddenException::class)
-    fun handleAccessForbiddenException(): ResponseEntity<*> = responseForbidden
+    fun handleAccessForbiddenException(): ResponseEntity<*> = RESPONSE_FORBIDDEN
 }
