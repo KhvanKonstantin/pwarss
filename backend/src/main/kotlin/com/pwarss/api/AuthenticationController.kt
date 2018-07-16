@@ -2,13 +2,11 @@
 
 package com.pwarss.api
 
+import com.pwarss.model.User
 import com.pwarss.ttrs.UserServiceTtrss
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 /**
  * REST endpoint for login and logout commands
@@ -18,6 +16,11 @@ import org.springframework.web.bind.annotation.RestController
 class AuthenticationController(val userService: UserServiceTtrss, val authentication: SessionAuthentication) {
 
     class LoginRequestFormData(val login: String?, val password: String?)
+
+    @GetMapping("/user")
+    fun user(user: User): ResponseEntity<User> {
+        return ResponseEntity.ok(user)
+    }
 
     @PostMapping("/login", consumes = [MediaType.APPLICATION_JSON_UTF8_VALUE], produces = [MediaType.APPLICATION_JSON_UTF8_VALUE])
     fun login(@RequestBody loginRequest: LoginRequestFormData): ResponseEntity<*> {
