@@ -1,8 +1,33 @@
 // Created by Konstantin Khvan on 7/11/18 2:04 PM
 
 import * as React from 'react';
-import './styles/App.css';
-import Login from "./login/Login";
+import {inject, observer} from "mobx-react";
+import AuthStore from "./stores/AuthStore";
+import Login from "./forms/Login";
+import Root from "./forms/Root";
+import Splash from "./forms/Splash";
 
-const App = () => <div><Login/></div>;
-export default App;
+@inject("authStore")
+@observer
+export default class App extends React.Component {
+    componentDidMount() {
+        // @ts-ignore
+        const authStore = this.props.authStore as AuthStore;
+
+        authStore.updateUserState();
+    }
+
+
+    render(): React.ReactNode {
+        // @ts-ignore
+        const authStore = this.props.authStore as AuthStore;
+        const userRefreshed = authStore.userRefreshed;
+        const loggedIn = authStore.isLoggedIn;
+
+        if (!userRefreshed) {
+            return <Splash/>;
+        }
+
+        return loggedIn ? <Root/> : <Login/>;
+    }
+}

@@ -1,5 +1,8 @@
 // Created by Konstantin Khvan on 7/11/18 2:05 PM
 
+import {User} from "./model/User";
+import {NewsEntry} from "./model/NewsEntry";
+
 function encodeToQuery(params: { [name: string]: any }): string {
     if (params) {
         return "?" + Object.keys(params)
@@ -38,15 +41,16 @@ function getJson<T>(path: string, params: { [name: string]: any } = {}): Promise
 
 const api = {
     user: {
-        login: (login: string, password: string) => postJson("login", {login, password}),
-        logout: () => postJson("logout", {}),
+        login: (login: string, password: string) => postJson<User>("login", {login, password}),
+        logout: () => postJson<any>("logout", {}),
+        user: () => getJson<any>("user", {}),
     },
 
     entry: {
-        findById: (id: number) => getJson("/entries/" + id),
-        findAll: (limit: number) => getJson("/entries", {limit}),
-        findUnread: (limit: number) => getJson("/unread", {limit}),
-        findMarked: (limit: number) => getJson("/marked", {limit})
+        findById: (id: number) => getJson<NewsEntry>("/entries/" + id),
+        findAll: (limit: number) => getJson<Array<NewsEntry>>("/entries", {limit}),
+        findUnread: (limit: number) => getJson<Array<NewsEntry>>("/unread", {limit}),
+        findMarked: (limit: number) => getJson<Array<NewsEntry>>("/marked", {limit})
     }
 
 };
