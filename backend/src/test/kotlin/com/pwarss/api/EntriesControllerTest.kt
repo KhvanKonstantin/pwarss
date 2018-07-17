@@ -8,6 +8,7 @@ import com.pwarss.model.User
 import com.pwarss.testutil.DefaultTestPropertiesSource
 import com.pwarss.ttrs.EntriesServiceTtrss
 import com.pwarss.ttrs.UserServiceTtrss
+import com.pwarss.ttrs.UserWithHashedPassword
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
@@ -44,8 +45,11 @@ class EntriesControllerTest {
 
     private fun doLogin(): Pair<MockHttpSession, User> {
         val user = User(1, "login")
+        val uah = UserWithHashedPassword(user, "hash")
         val password = "password"
-        Mockito.doReturn(user).`when`(userService).checkPassword(user.login, password)
+
+        Mockito.doReturn(uah).`when`(userService).checkPassword(user.login, password)
+        Mockito.doReturn(true).`when`(userService).checkSessionIsStillValid(user.login, uah.hashedPassword)
 
         val session = MockHttpSession()
 

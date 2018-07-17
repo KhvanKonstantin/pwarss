@@ -5,7 +5,7 @@ package com.pwarss.ttrs
 import com.pwarss.PwarssApplication
 import com.pwarss.testutil.DefaultTestPropertiesSource
 import com.pwarss.testutil.TestProperties
-import org.junit.Assert
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,12 +24,26 @@ internal class UserServiceTtrssTest {
     lateinit var userService: UserServiceTtrss
 
     @Autowired
-    lateinit var testProperties: TestProperties
+    lateinit var props: TestProperties
 
     @Test
     fun checkPassword() {
-        Assert.assertNull(userService.checkPassword("", ""))
+        assertThat(userService.checkPassword("", "")).isNull()
 
-        Assert.assertNotNull(userService.checkPassword(testProperties.username, testProperties.password))
+        assertThat(userService.checkPassword(props.username, props.password)).isNotNull()
+    }
+
+
+    @Test
+    fun checkSessionIsStillValid() {
+        val uah = userService.checkPassword(props.username, props.password)
+
+        assertThat(uah).isNotNull()
+
+        assertThat(userService.checkSessionIsStillValid(props.username, uah!!.hashedPassword)).isTrue()
+
+        assertThat(userService.checkSessionIsStillValid("", uah!!.hashedPassword)).isFalse()
+
+        assertThat(userService.checkSessionIsStillValid(props.username, "")).isFalse()
     }
 }

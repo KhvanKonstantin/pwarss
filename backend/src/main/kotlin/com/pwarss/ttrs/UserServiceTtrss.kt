@@ -2,6 +2,8 @@
 
 package com.pwarss.ttrs
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreType
 import com.pwarss.model.User
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
@@ -9,6 +11,10 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.security.crypto.codec.Hex
 import org.springframework.stereotype.Service
 import java.security.MessageDigest
+
+@JsonIgnoreType
+data class UserWithHashedPassword(@JsonIgnore val user: User,
+                                  @JsonIgnore val hashedPassword: String)
 
 /**
  * tt-rss db based user repository
@@ -18,7 +24,7 @@ class UserServiceTtrss(private val jdbcTemplate: JdbcTemplate) {
 
     private class CheckPasswordRSRow(val id: Long, val pwdHash: String, val salt: String)
 
-    fun checkPassword(loginArg: String?, passwordArg: String?): User? {
+    fun checkPassword(loginArg: String?, passwordArg: String?): UserWithHashedPassword? {
 
         val login = loginArg?.trim() ?: ""
         val password = passwordArg ?: ""
@@ -44,7 +50,22 @@ class UserServiceTtrss(private val jdbcTemplate: JdbcTemplate) {
             return null
         }
 
-        return User(row.id, login)
+        return UserWithHashedPassword(User(row.id, login), passwordHash)
+    }
+
+    fun checkSessionIsStillValid(login: String, passwordHash: String): Boolean {
+        val mapper = RowMapper { rs, _ ->
+            CheckPasswordRSRow(rs.getLong("id"), rs.getString("pwd_hash") ?: "", "")
+        }
+
+        val row = try {
+            val query = "SELECT id, pwd_hash, salt FROM ttrss_users WHERE login=?"
+            jdbcTemplate.queryForObject(query, arrayOf(login), mapper)
+        } catch (e: IncorrectResultSizeDataAccessException) {
+            null
+        }
+
+        return passwordHash == row?.pwdHash
     }
 }
 

@@ -33,7 +33,7 @@ class EntriesServiceTest {
 
     @PostConstruct
     fun init() {
-        ownerId = userService.checkPassword(testProperties.username, testProperties.password)!!.id
+        ownerId = userService.checkPassword(testProperties.username, testProperties.password)!!.user.id
     }
 
     @Test

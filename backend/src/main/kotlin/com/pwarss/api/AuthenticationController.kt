@@ -23,21 +23,21 @@ class AuthenticationController(val userService: UserServiceTtrss, val authentica
     }
 
     @PostMapping("/login", consumes = [MediaType.APPLICATION_JSON_UTF8_VALUE], produces = [MediaType.APPLICATION_JSON_UTF8_VALUE])
-    fun login(@RequestBody loginRequest: LoginRequestFormData): ResponseEntity<*> {
-        val user = userService.checkPassword(loginRequest.login, loginRequest.password)
+    fun login(@RequestBody loginRequest: LoginRequestFormData): ResponseEntity<User> {
+        val uah = userService.checkPassword(loginRequest.login, loginRequest.password)
 
-        return when (user) {
-            null -> RESPONSE_FORBIDDEN
+        return when (uah) {
+            null -> throw AccessForbiddenException()
             else -> {
-                authentication.user.set(user)
-                ResponseEntity.ok(user)
+                authentication.login(uah)
+                ResponseEntity.ok(uah.user)
             }
         }
     }
 
     @PostMapping("/logout")
     fun logout(): ResponseEntity<String> {
-        authentication.user.set(null)
+        authentication.logout()
         return ResponseEntity.ok("{\"logout\":\"ok\"}")
     }
 }
