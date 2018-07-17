@@ -9,16 +9,16 @@ import Splash from "./forms/Splash";
 
 @inject("authStore")
 @observer
-export default class App extends React.Component <{ authStore: AuthStore }, {}> {
+export default class App extends React.Component <{ authStore?: AuthStore }> {
 
     componentDidMount() {
-        const {authStore} = this.props;
+        const authStore = this.props.authStore!;
         authStore.updateUserState();
     }
 
 
     render(): React.ReactNode {
-        const {authStore} = this.props;
+        const authStore = this.props.authStore!;
         const userRefreshed = authStore.userRefreshed;
         const loggedIn = authStore.isLoggedIn;
 
