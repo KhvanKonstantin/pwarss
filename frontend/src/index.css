@@ -19,6 +19,18 @@ body {
     justify-content: center;
 }
 
+.root{
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
 .login-form {
     display: flex;
     flex-direction: column;
@@ -31,3 +43,30 @@ body {
     margin: 5px;
 }
 
+ul.news-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.news-list .title {
+    margin-left: 5px;
+}
+
+.news-list li {
+    display: flex;
+    padding: 5px;
+    border: 1px solid lightgrey;
+}
+
+.news-list .unread {
+    font-weight: bold;
+}
+
+.news-list .notmarked {
+    color: grey;
+}
+
+.news-list .marked {
+    color: red;
+}

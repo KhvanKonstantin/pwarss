@@ -13,10 +13,10 @@ export default class Root extends React.Component<{ doLogout: () => Promise<any>
     };
 
     render() {
-        return (<form>
+        return (<div className="root">
                 <button onClick={this.logout}>Logout</button>
                 <NewsEntryList/>
-            </form>
+            </div>
         );
     }
 }
