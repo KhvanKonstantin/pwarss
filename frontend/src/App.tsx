@@ -22,10 +22,18 @@ export default class App extends React.Component <{ authStore?: AuthStore }> {
         const userRefreshed = authStore.userRefreshed;
         const loggedIn = authStore.isLoggedIn;
 
+        let content = null;
+
         if (!userRefreshed) {
-            return <Splash/>;
+            content = <Splash/>;
+        } else {
+            if (loggedIn) {
+                content = <Root doLogout={() => authStore.logout()}/>;
+            } else {
+                content = <Login doLogin={(login, password) => authStore.login(login, password)}/>;
+            }
         }
 
-        return loggedIn ? <Root/> : <Login/>;
+        return content;
     }
 }

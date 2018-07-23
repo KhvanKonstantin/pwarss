@@ -18,7 +18,9 @@ function processJsonResponse<T>(response: Response): Promise<T> {
         return response.json() as Promise<T>;
     }
 
-    throw new Error("Connection error. status = " + response.status);
+    let error = new Error("Connection error.") as any;
+    error.response = response;
+    throw error;
 }
 
 function postJson<T>(path: string, request: any): Promise<T> {

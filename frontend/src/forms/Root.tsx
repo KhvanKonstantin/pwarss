@@ -2,8 +2,21 @@
 
 
 import * as React from 'react';
+import {FormEvent} from 'react';
 
 
-const Root = () => <div>Root</div>;
+export default class Root extends React.Component<{ doLogout: () => Promise<any> }> {
+    private logout = (e: FormEvent) => {
+        e.preventDefault();
+        this.props.doLogout();
+    };
 
-export default Root;
+    render() {
+        return (<form>
+                <button onClick={this.logout}>Logout</button>
+            </form>
+        );
+    }
+}
+
+
