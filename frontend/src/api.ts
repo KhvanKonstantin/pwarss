@@ -3,6 +3,10 @@
 import {User} from "./model/User";
 import {NewsEntry} from "./model/NewsEntry";
 
+export class GenericResponse {
+    success: boolean
+}
+
 function encodeToQuery(params: { [name: string]: any }): string {
     if (params) {
         return "?" + Object.keys(params)
@@ -52,7 +56,10 @@ const api = {
         findById: (id: number) => getJson<NewsEntry>("/entries/" + id),
         findAll: (limit: number) => getJson<Array<NewsEntry>>("/entries", {limit}),
         findUnread: (limit: number) => getJson<Array<NewsEntry>>("/unread", {limit}),
-        findMarked: (limit: number) => getJson<Array<NewsEntry>>("/marked", {limit})
+        findMarked: (limit: number) => getJson<Array<NewsEntry>>("/marked", {limit}),
+
+        markEntry: (id: number, mark: boolean) => postJson<GenericResponse>(`/entries/${id}/mark`, {mark}),
+        markEntryRead: (id: number, read: boolean) => postJson<GenericResponse>(`/entries/${id}/read`, {read})
     }
 
 };

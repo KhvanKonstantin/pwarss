@@ -35,15 +35,21 @@ export default class Root extends React.Component<RootProps, RootState> {
 
     private onTitleClicked = (id: number) => {
         console.log(`Title clicked ${id}`);
-        this.setState({newsEntryId: id})
+        const newsStore = this.props.newsStore!;
+        newsStore.markEntryRead(id, true);
+        this.setState({newsEntryId: id});
     };
 
     private onMarkUnreadClicked = (id: number) => {
-        console.log(`Mark unread clicked ${id}`)
+        console.log(`Mark unread clicked ${id}`);
+        const newsStore = this.props.newsStore!;
+        newsStore.markEntryRead(id, false);
     };
 
     private onMarkClicked = (id: number) => {
-        console.log(`Mark clicked ${id}`)
+        console.log(`Mark clicked ${id}`);
+        const newsStore = this.props.newsStore!;
+        newsStore.toggleEntryMark(id);
     };
 
     render() {

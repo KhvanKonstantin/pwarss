@@ -6,6 +6,7 @@ import com.pwarss.model.NewsEntry
 import com.pwarss.model.User
 import com.pwarss.ttrs.EntriesServiceTtrss
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -41,5 +42,23 @@ class EntriesController(private val entriesService: EntriesServiceTtrss) {
     fun findMarked(@RequestParam("limit", required = false, defaultValue = "500") limit: Int, user: User): ResponseEntity<List<NewsEntry>> {
         val entries = entriesService.findMarked(user.id, limit)
         return ResponseEntity.ok(entries)
+    }
+
+    class GenericResponse(val success: Boolean)
+
+    class MarkEntryFormData(val mark: Boolean?)
+
+    @PostMapping("/entries/{id}/mark", consumes = [MediaType.APPLICATION_JSON_UTF8_VALUE], produces = [MediaType.APPLICATION_JSON_UTF8_VALUE])
+    fun markEntry(@PathVariable("id") id: Long, @RequestBody form: MarkEntryFormData, user: User): ResponseEntity<GenericResponse> {
+        val success = entriesService.markEntry(user.id, id, form.mark ?: true)
+        return ResponseEntity.ok(GenericResponse(success))
+    }
+
+    class MarkEntryReadFormData(val read: Boolean?)
+
+    @PostMapping("/entries/{id}/read", consumes = [MediaType.APPLICATION_JSON_UTF8_VALUE], produces = [MediaType.APPLICATION_JSON_UTF8_VALUE])
+    fun markEntryRead(@PathVariable("id") id: Long, @RequestBody form: MarkEntryReadFormData, user: User): ResponseEntity<GenericResponse> {
+        val success = entriesService.markEntryRead(user.id, id, form.read ?: true)
+        return ResponseEntity.ok(GenericResponse(success))
     }
 }

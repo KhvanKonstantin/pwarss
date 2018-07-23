@@ -10,7 +10,7 @@ export default class NewsStore {
 
     async updateNews(): Promise<any> {
         try {
-            let newsEntries = await api.entry.findAll(20);
+            let newsEntries = await api.entry.findAll(200);
             runInAction(() => {
                 this.latestNews.replace(newsEntries);
             });
@@ -26,6 +26,38 @@ export default class NewsStore {
         });
 
         return entry ? entry : NullEntry;
+    }
+
+    async toggleEntryMark(id: number) {
+        try {
+            const entry = this.entryById(id);
+            if (entry.id != NullEntry.id) {
+                let {success} = await api.entry.markEntry(id, !entry.marked);
+                if (success) {
+                    runInAction(() => {
+                        entry.marked = !entry.marked;
+                    });
+                }
+            }
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    async markEntryRead(id: number, read: boolean) {
+        try {
+            const entry = this.entryById(id);
+            if (entry.id != NullEntry.id) {
+                let {success} = await api.entry.markEntryRead(id, read);
+                if (success) {
+                    runInAction(() => {
+                        entry.read = read;
+                    });
+                }
+            }
+        } catch (e) {
+            console.log(e)
+        }
     }
 }
 

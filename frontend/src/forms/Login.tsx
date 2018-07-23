@@ -32,10 +32,13 @@ export default class Login extends React.Component<{ doLogin: (login: string, pa
         errors: {}
     };
 
-    onChange = (e: ChangeEvent<HTMLInputElement>) =>
+    onChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const {name, value} = e.target;
+
         this.setState({
-            data: {...this.state.data, [e.target.name]: e.target.value}
+            data: {...this.state.data, [name]: value}
         });
+    };
 
     onSubmit = async (e: FormEvent) => {
         e.preventDefault();
