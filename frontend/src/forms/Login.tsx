@@ -23,7 +23,7 @@ interface State {
 }
 
 export default class Login extends React.Component<{ doLogin: (login: string, password: string) => Promise<User> }, State> {
-    initialState: State = {
+    state: State = {
         data: {
             login: "",
             password: ""
@@ -31,8 +31,6 @@ export default class Login extends React.Component<{ doLogin: (login: string, pa
         loading: false,
         errors: {}
     };
-
-    state = this.initialState;
 
     onChange = (e: ChangeEvent<HTMLInputElement>) =>
         this.setState({

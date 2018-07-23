@@ -12,10 +12,18 @@ export default class Root extends React.Component<{ doLogout: () => Promise<any>
         this.props.doLogout();
     };
 
+    private onTitleClicked = (id: number) => {
+        console.log(`Title clicked ${id}`)
+    };
+
+    private onMarkClicked = (id: number) => {
+        console.log(`Mark clicked ${id}`)
+    };
+
     render() {
         return (<div className="root">
                 <button onClick={this.logout}>Logout</button>
-                <NewsEntryList/>
+                <NewsEntryList onMarkClicked={this.onMarkClicked} onTitleClicked={this.onTitleClicked}/>
             </div>
         );
     }
