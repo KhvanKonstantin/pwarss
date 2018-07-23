@@ -9,3 +9,13 @@ export class NewsEntry {
     date: string;
     content: string;
 }
+
+export const NullEntry: NewsEntry = {
+    id: -1,
+    read: true,
+    marked: false,
+    link: "",
+    title: "",
+    date: "",
+    content: ""
+};

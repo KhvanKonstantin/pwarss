@@ -1,7 +1,7 @@
 // Created by Konstantin Khvan on 7/23/18 2:43 PM
 
 import {IObservableArray, observable, runInAction} from "mobx";
-import {NewsEntry} from "../model/NewsEntry";
+import {NewsEntry, NullEntry} from "../model/NewsEntry";
 import api from "../api";
 
 export default class NewsStore {
@@ -18,6 +18,14 @@ export default class NewsStore {
             console.log(e)
         }
         return "refreshed";
+    }
+
+    entryById(newsEntryId: number): NewsEntry {
+        const entry = this.latestNews.find(function (entry) {
+            return newsEntryId === entry.id
+        });
+
+        return entry ? entry : NullEntry;
     }
 }
 
