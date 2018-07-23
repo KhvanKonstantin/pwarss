@@ -5,6 +5,7 @@ import './index.css';
 import {configure} from "mobx";
 import {onError, Provider} from "mobx-react";
 import AuthStore from "./stores/AuthStore";
+import NewsStore from "./stores/NewsStore";
 // import registerServiceWorker from './registerServiceWorker';
 
 configure({enforceActions: "strict"});
@@ -14,8 +15,9 @@ onError(error => {
 });
 
 const authStore = new AuthStore();
+const newsStore = new NewsStore();
 
-ReactDOM.render(<Provider authStore={authStore}>
+ReactDOM.render(<Provider authStore={authStore} newsStore={newsStore}>
     <App/>
 </Provider>, document.getElementById('root'));
 

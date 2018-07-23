@@ -3,6 +3,7 @@
 
 import * as React from 'react';
 import {FormEvent} from 'react';
+import NewsEntryList from "./NewsList";
 
 
 export default class Root extends React.Component<{ doLogout: () => Promise<any> }> {
@@ -14,6 +15,7 @@ export default class Root extends React.Component<{ doLogout: () => Promise<any>
     render() {
         return (<form>
                 <button onClick={this.logout}>Logout</button>
+                <NewsEntryList/>
             </form>
         );
     }
