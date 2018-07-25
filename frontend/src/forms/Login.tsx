@@ -32,6 +32,16 @@ export default class Login extends React.Component<{ doLogin: (login: string, pa
         errors: {}
     };
 
+    loginInputRef = React.createRef<HTMLInputElement>();
+
+    componentDidMount(): void {
+        const current = this.loginInputRef.current;
+        if (current) {
+            current.focus();
+        }
+    }
+
+
     onChange = (e: ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
 
@@ -82,7 +92,7 @@ export default class Login extends React.Component<{ doLogin: (login: string, pa
         return (
             <form className="login-form" onSubmit={this.onSubmit}>
                 <input name="login" placeholder="login" disabled={loading}
-                       value={data.login} onChange={this.onChange}/>
+                       value={data.login} onChange={this.onChange} ref={this.loginInputRef}/>
                 <input type="password" name="password" placeholder="password" disabled={loading}
                        value={data.password} onChange={this.onChange}/>
                 <button disabled={loading}>Login</button>
