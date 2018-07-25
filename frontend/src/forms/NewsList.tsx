@@ -13,7 +13,7 @@ function newsEntry(entry: NewsEntry) {
     const markCN = !marked ? "notmarked" : "marked";
 
     return <li key={id}>
-        <div className={markCN} data-mark={id}>*</div>
+        <div className={`mark ${markCN}`} data-mark={id}>★</div>
         <div className={`title ${readCN}`} data-title={id}>{title}</div>
     </li>;
 }

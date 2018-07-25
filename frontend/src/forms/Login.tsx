@@ -91,6 +91,7 @@ export default class Login extends React.Component<{ doLogin: (login: string, pa
 
         return (
             <form className="login-form" onSubmit={this.onSubmit}>
+                <h2>PWARSS</h2>
                 <input name="login" placeholder="login" disabled={loading}
                        value={data.login} onChange={this.onChange} ref={this.loginInputRef}/>
                 <input type="password" name="password" placeholder="password" disabled={loading}

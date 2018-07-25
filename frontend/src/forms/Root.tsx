@@ -68,8 +68,12 @@ export default class Root extends React.Component<RootProps, RootState> {
         }
 
         return (<div className="root">
-                <button onClick={this.logout}>Logout</button>
-                {content}
+                <div className="header">
+                    <a className="logout" onClick={this.logout}>Logout</a>
+                </div>
+                <div className="content">
+                    {content}
+                </div>
             </div>
         );
     }

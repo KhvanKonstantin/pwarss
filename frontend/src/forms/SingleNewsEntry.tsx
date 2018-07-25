@@ -21,10 +21,12 @@ export default function SingleNewsEntry({entry, onMarkClicked, onMarkUnreadClick
     const textContent = extractTextFromHtmlString(content);
 
     return <div className="news-entry">
-        <div className={markCN} onClick={() => onMarkClicked(id)}>*</div>
-        <div className={readCN} onClick={() => onMarkUnreadClicked(id)}>{read ? "Mark unread" : "Mark read"}</div>
-        <a rel="noopener noreferrer" target="_blank" className="title" href={link}>{title}</a>
-        <div className="date">{date}</div>
+        <div className="header">
+            <div className={markCN} onClick={() => onMarkClicked(id)}>★</div>
+            <div className={readCN} onClick={() => onMarkUnreadClicked(id)}>{!read ? "Mark unread" : "Mark read"}</div>
+            <a rel="noopener noreferrer" target="_blank" className="title" href={link}>{title}</a>
+            <div className="date">{date}</div>
+        </div>
         <div className="content">{textContent}</div>
     </div>;
 }
