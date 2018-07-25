@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import App from './App';
+import "normalize.css";
 import './index.css';
 import {configure} from "mobx";
 import {onError, Provider} from "mobx-react";
