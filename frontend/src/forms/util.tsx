@@ -14,3 +14,7 @@ export function ErrorSpan({text}: { text?: string }) {
     return spanIf({text, color: "red"});
 }
 
+
+export function extractTextFromHtmlString(html: string) {
+    return (new DOMParser).parseFromString(html, "text/html").documentElement.textContent;
+}

@@ -4,6 +4,7 @@
 
 import * as React from "react";
 import {NewsEntry} from "../model/NewsEntry";
+import {extractTextFromHtmlString} from "./util";
 
 export interface SingleNewsEntryProps {
     entry: NewsEntry
@@ -17,12 +18,14 @@ export default function SingleNewsEntry({entry, onMarkClicked, onMarkUnreadClick
     const readCN = read ? "" : "unread";
     const markCN = !marked ? "notmarked" : "marked";
 
+    const textContent = extractTextFromHtmlString(content);
+
     return <div className="news-entry">
         <div className={markCN} onClick={() => onMarkClicked(id)}>*</div>
         <div className={readCN} onClick={() => onMarkUnreadClicked(id)}>{read ? "Mark unread" : "Mark read"}</div>
         <a rel="noopener noreferrer" target="_blank" className="title" href={link}>{title}</a>
         <div className="date">{date}</div>
-        <div className="content">{content}</div>
+        <div className="content">{textContent}</div>
     </div>;
 }
 
