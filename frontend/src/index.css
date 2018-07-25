@@ -58,13 +58,18 @@ body {
     overflow: hidden;
 
     display: flex;
+    align-items: center;
 }
 
 .root > .header .logout {
 
 }
 
-.root .content {
+.root .header-title {
+    flex-grow: 1;
+}
+
+.root > .content {
     margin-top: 2em;
 }
 
@@ -101,6 +106,40 @@ ul.news-list {
     color: gold;
 }
 
+.news-entry {
+    padding: 5px;
+}
+
 .news-entry .header {
     display: flex;
+}
+
+.news-entry .header a {
+    padding: 5px;
+    text-indent: 30px;
+    text-align: justify;
+
+    text-decoration: none;
+}
+
+.header-item {
+    padding: 2px;
+}
+
+.news-entry .notmarked {
+    color: lightgrey;
+}
+
+.news-entry .marked {
+    color: gold;
+}
+
+.news-entry .date {
+    padding: 5px;
+}
+
+.news-entry .content {
+    padding: 5px;
+    text-indent: 30px;
+    text-align: justify;
 }

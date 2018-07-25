@@ -5,6 +5,7 @@
 import * as React from "react";
 import {NewsEntry} from "../model/NewsEntry";
 import {extractTextFromHtmlString} from "./util";
+import {observer} from "mobx-react";
 
 export interface SingleNewsEntryProps {
     entry: NewsEntry
@@ -12,23 +13,29 @@ export interface SingleNewsEntryProps {
     onMarkUnreadClicked: (id: number) => any
 }
 
-export default function SingleNewsEntry({entry, onMarkClicked, onMarkUnreadClicked}: SingleNewsEntryProps) {
-    const {id, title, marked, read, link, content, date} = entry;
+@observer
+class SingleNewsEntry extends React.Component<SingleNewsEntryProps> {
+    render() {
+        const {entry, onMarkClicked, onMarkUnreadClicked} = this.props;
 
-    const readCN = read ? "" : "unread";
-    const markCN = !marked ? "notmarked" : "marked";
+        const {id, title, marked, read, link, content, date} = entry;
 
-    const textContent = extractTextFromHtmlString(content);
+        const readCN = read ? "" : "unread";
+        const markCN = !marked ? "notmarked" : "marked";
 
-    return <div className="news-entry">
-        <div className="header">
-            <div className={markCN} onClick={() => onMarkClicked(id)}>★</div>
+        const textContent = extractTextFromHtmlString(content);
+
+        return <div className="news-entry">
+            <div className="header">
+                <div className={markCN} onClick={() => onMarkClicked(id)}>★</div>
+                <a rel="noopener noreferrer" target="_blank" className="title" href={link}>{title}</a>
+            </div>
             <div className={readCN} onClick={() => onMarkUnreadClicked(id)}>{!read ? "Mark unread" : "Mark read"}</div>
-            <a rel="noopener noreferrer" target="_blank" className="title" href={link}>{title}</a>
             <div className="date">{date}</div>
-        </div>
-        <div className="content">{textContent}</div>
-    </div>;
+            <div className="content">{textContent}</div>
+        </div>;
+    }
 }
 
 
+export default SingleNewsEntry;

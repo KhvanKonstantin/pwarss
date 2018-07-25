@@ -69,7 +69,9 @@ export default class Root extends React.Component<RootProps, RootState> {
 
         return (<div className="root">
                 <div className="header">
-                    <a className="logout" onClick={this.logout}>Logout</a>
+                    <div className="header-item header-menu">Menu</div>
+                    <div className="header-item header-title"/>
+                    <div className="header-item header-right-menu"><a onClick={this.logout}>Logout</a></div>
                 </div>
                 <div className="content">
                     {content}
