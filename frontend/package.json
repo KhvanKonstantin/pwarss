@@ -13,6 +13,7 @@
   "dependencies": {
     "mobx": "^5.0.3",
     "mobx-react": "^5.2.3",
+    "mobx-react-devtools":"^5.0.1",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-scripts-ts": "2.16.0"

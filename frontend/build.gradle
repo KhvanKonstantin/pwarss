@@ -19,3 +19,7 @@ task cleanFrontend(type: Delete) {
 task buildFrontend(type: YarnTask) {
     args = ["build"]
 }
+
+if (!file("${project.projectDir}/node_modules").exists()) {
+    buildFrontend.dependsOn("yarn_install")
+}
