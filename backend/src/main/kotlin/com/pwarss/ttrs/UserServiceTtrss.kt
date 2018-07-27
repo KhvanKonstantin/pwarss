@@ -44,8 +44,7 @@ class UserServiceTtrss(private val jdbcTemplate: JdbcTemplate) {
             return null
         }
 
-        val mode2 = row.pwdHash.startsWith("MODE2:")
-        val passwordHash = encrypt_password(password, row.salt, mode2)
+        val passwordHash = "MODE2:${sha256(row.salt + password)}"
         if (row.pwdHash != passwordHash) {
             return null
         }
@@ -69,23 +68,8 @@ class UserServiceTtrss(private val jdbcTemplate: JdbcTemplate) {
     }
 }
 
-// password function ported from tt-rss
-// this may calculate wrong results since php strings are non unicode (looks like they are 8bit ascii)
-@Suppress("FunctionName")
-private fun encrypt_password(pass: String, salt: String = "", mode2: Boolean = false) = when {
-    salt.isNotBlank() && mode2 -> "MODE2:${Sha256Encoder(salt + pass)}"
-    salt.isNotBlank() -> "SHA1X:${Sha1Encoder("$salt:$pass")}"
-    else -> "SHA1:${Sha1Encoder(pass)}"
+private fun sha256(str: String): String {
+    val digester = MessageDigest.getInstance("SHA-256")
+    val binaryHash = digester.digest(str.toByteArray())
+    return String(Hex.encode(binaryHash))
 }
-
-private open class Encoder(algo: String) {
-    private val digester = MessageDigest.getInstance(algo)
-
-    operator fun invoke(str: String): String {
-        val binaryHash = digester.digest(str.toByteArray())
-        return String(Hex.encode(binaryHash))
-    }
-}
-
-private object Sha1Encoder : Encoder("sha1")
-private object Sha256Encoder : Encoder("SHA-256")
