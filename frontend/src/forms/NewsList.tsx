@@ -52,7 +52,14 @@ export default class NewsEntryList extends React.Component<NewsEntryListProps> {
     render() {
         const newsStore = this.props.newsStore!;
         const latestNews = newsStore.latestNews;
-        return <ul className="news-list" onClick={this.onClick}>{latestNews.map(newsEntry)}</ul>
+        return <div className="news-list">
+            <ul onClick={this.onClick}>
+                {latestNews.map(newsEntry)}
+            </ul>
+            <div className="refresh">
+                <div>↻</div>
+            </div>
+        </div>
     }
 }
 

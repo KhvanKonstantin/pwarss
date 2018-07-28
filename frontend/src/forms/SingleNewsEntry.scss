@@ -1,0 +1,36 @@
+// Created by Konstantin Khvan on 7/26/18 7:00 PM
+
+.news-entry {
+
+    padding: 5px;
+
+    .header {
+        display: flex;
+
+        a {
+            padding: 5px;
+            text-indent: 30px;
+            text-align: justify;
+
+            text-decoration: none;
+        }
+    }
+
+    .notmarked {
+        color: lightgrey;
+    }
+
+    .marked {
+        color: gold;
+    }
+
+    .date {
+        padding: 5px;
+    }
+
+    .content {
+        padding: 5px;
+        text-indent: 30px;
+        text-align: justify;
+    }
+}

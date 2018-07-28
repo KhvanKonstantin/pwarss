@@ -18,7 +18,7 @@ interface RootState {
 }
 
 @inject("newsStore")
-export default class Root extends React.Component<RootProps, RootState> {
+export default class Main extends React.Component<RootProps, RootState> {
     state = {
         newsEntryId: null
     };
@@ -67,11 +67,17 @@ export default class Root extends React.Component<RootProps, RootState> {
             content = <NewsEntryList onMarkClicked={this.onMarkClicked} onTitleClicked={this.onTitleClicked}/>;
         }
 
-        return (<div className="root">
+        return (<div className="main-form">
                 <div className="header">
-                    <div className="header-item header-menu">Menu</div>
-                    <div className="header-item header-title"/>
-                    <div className="header-item header-right-menu"><a onClick={this.logout}>Logout</a></div>
+                    <div className="item menu">☰
+                        <div className="menu-item">☰</div>
+                        <div className="menu-item"><a onClick={this.logout}>Logout</a></div>
+                    </div>
+                    <div className="item title"/>
+                    <div className="item right-menu">
+                        <div className="menu-item">⋮</div>
+                    </div>
+
                 </div>
                 <div className="content">
                     {content}

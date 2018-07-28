@@ -1,0 +1,53 @@
+// Created by Konstantin Khvan on 7/26/18 6:59 PM
+
+.news-list {
+    > ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        > li {
+            display: flex;
+            padding: 2px;
+            border-bottom: 1px solid lightgrey;
+
+            .mark {
+                font-weight: bold;
+                margin: 0 5px 0 0;
+
+                &.notmarked {
+                    color: lightgrey;
+                }
+
+                &.marked {
+                    color: gold;
+                }
+            }
+
+            .title.unread {
+                font-weight: bold;
+            }
+        }
+    }
+
+    > .refresh {
+        position: fixed;
+        right: 1em;
+        bottom: 1em;
+
+        > div {
+            background: orangered;
+            color: white;
+            font-weight: bold;
+
+            box-shadow: 2px 2px 5px grey;
+
+            display: table-cell;
+            width: 2em;
+            height: 2em;
+            border-radius: 1em;
+            text-align: center;
+            vertical-align: middle;
+        }
+    }
+}

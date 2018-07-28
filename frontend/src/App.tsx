@@ -4,7 +4,7 @@ import * as React from 'react';
 import {inject, observer} from "mobx-react";
 import AuthStore from "./stores/AuthStore";
 import Login from "./forms/Login";
-import Root from "./forms/Root";
+import Main from "./forms/Main";
 import Splash from "./forms/Splash";
 
 @inject("authStore")
@@ -28,7 +28,7 @@ export default class App extends React.Component <{ authStore?: AuthStore }> {
             content = <Splash/>;
         } else {
             if (loggedIn) {
-                content = <Root doLogout={() => authStore.logout()}/>;
+                content = <Main doLogout={() => authStore.logout()}/>;
             } else {
                 content = <Login doLogin={(login, password) => authStore.login(login, password)}/>;
             }
