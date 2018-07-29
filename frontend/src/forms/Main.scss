@@ -24,16 +24,54 @@
         display: flex;
         align-items: center;
 
+        user-select: none;
+
+        box-shadow: 0 5px 15px rgba(0, 0, 0, .3);
+
         > .title {
             flex-grow: 1;
         }
 
         > .item {
-            padding: 2px;
+            color: white;
+            padding: 10px;
         }
     }
 
     > .content {
         margin-top: 2em;
+    }
+
+    .menu {
+        display: none;
+
+        background: mediumpurple;
+        flex-direction: column;
+
+        position: fixed;
+        top: 2em;
+        left: 0;
+
+        box-shadow: 0 5px 15px rgba(0, 0, 0, .3);
+
+        &.active {
+            display: flex;
+        }
+
+        &.right {
+            left: unset;
+            right: 0;
+
+            box-shadow: 0 5px 15px rgba(0, 0, 0, .3);
+        }
+    }
+
+    .menu-item {
+        color: white;
+        padding: 10px;
+
+        &:hover {
+            background: rebeccapurple;
+        }
     }
 }
