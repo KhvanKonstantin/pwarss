@@ -21,10 +21,10 @@
   },
 
   "scripts": {
-    "start-ts": "react-scripts-ts start",
+    "start-ts": "CHOKIDAR_USEPOLLING=true CHOKIDAR_INTERVAL=1000 react-scripts-ts start",
     "build-ts": "react-scripts-ts build",
     "build-css": "node-sass-chokidar --include-path ./src src/index.scss -o src/",
-    "watch-css": "npm run build-css && node-sass-chokidar --include-path ./src src/index.scss -o src/ --watch",
+    "watch-css": "npm run build-css && node-sass-chokidar --use-polling --polling-interval 1000 --include-path ./src src/index.scss -o src/ --watch",
     "start": "npm-run-all -p watch-css start-ts",
     "build": "npm-run-all build-css build-ts",
     "test": "CI=true react-scripts-ts test --env=jsdom",
