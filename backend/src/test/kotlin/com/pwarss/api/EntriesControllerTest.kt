@@ -4,11 +4,9 @@ package com.pwarss.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.pwarss.model.EMPTY_ENTRY
-import com.pwarss.model.User
 import com.pwarss.testutil.DefaultTestPropertiesSource
 import com.pwarss.ttrs.EntriesServiceTtrss
 import com.pwarss.ttrs.UserServiceTtrss
-import com.pwarss.ttrs.UserWithHashedPassword
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
@@ -16,56 +14,28 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.http.MediaType
-import org.springframework.mock.web.MockHttpSession
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @RunWith(SpringRunner::class)
 @DefaultTestPropertiesSource
 @SpringBootTest
 @AutoConfigureMockMvc
-class EntriesControllerTest {
+class EntriesControllerTest : MockMvcAuthSupport {
     @Autowired
-    lateinit var mockMvc: MockMvc
+    override lateinit var mockMvc: MockMvc
 
     @Autowired
-    lateinit var objectMapper: ObjectMapper
+    override lateinit var objectMapper: ObjectMapper
 
     @MockBean
-    lateinit var userService: UserServiceTtrss
+    override lateinit var userService: UserServiceTtrss
 
     @MockBean
     lateinit var entriesService: EntriesServiceTtrss
-
-    private fun jsonMatcher(obj: Any) = MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(obj))
-
-    private fun MockHttpServletRequestBuilder.jsonContent(obj: Any) = this
-            .contentType(MediaType.APPLICATION_JSON_UTF8)
-            .content(objectMapper.writeValueAsString(obj))
-
-    private fun doLogin(): Pair<MockHttpSession, User> {
-        val user = User(1, "login")
-        val uah = UserWithHashedPassword(user, "hash")
-        val password = "password"
-
-        Mockito.doReturn(uah).`when`(userService).checkPassword(user.login, password)
-        Mockito.doReturn(true).`when`(userService).checkSessionIsStillValid(user.login, uah.hashedPassword)
-
-        val session = MockHttpSession()
-
-        mockMvc.perform(post("/api/login")
-                .session(session)
-                .jsonContent(mapOf("login" to user.login, "password" to password)))
-                .andExpect(status().isOk)
-
-        return session to user
-    }
 
     @Test
     fun checkAccessIsForbiddenWithoutLogin() {

@@ -19,7 +19,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
-import org.springframework.mock.web.MockHttpSession
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
@@ -31,16 +30,16 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 @DefaultTestPropertiesSource
 @SpringBootTest
 @AutoConfigureMockMvc
-class AuthenticationControllerTest {
+class AuthenticationControllerTest : MockMvcAuthSupport {
 
     @Autowired
-    lateinit var mockMvc: MockMvc
+    override lateinit var mockMvc: MockMvc
 
     @Autowired
-    lateinit var objectMapper: ObjectMapper
+    override lateinit var objectMapper: ObjectMapper
 
     @MockBean
-    lateinit var userService: UserServiceTtrss
+    override lateinit var userService: UserServiceTtrss
 
     @Test
     fun loginFailureEmpty() {
@@ -54,8 +53,7 @@ class AuthenticationControllerTest {
                 }
 
         mockMvc.perform(post("/api/login")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(objectMapper.writeValueAsString(mapOf("login" to "", "password" to ""))))
+                .jsonContent(mapOf("login" to "", "password" to "")))
                 .andExpect(MockMvcResultMatchers.status().isForbidden)
                 .andDo {
                     assertThat(it.request.session?.user()).isNull()
@@ -73,10 +71,9 @@ class AuthenticationControllerTest {
         Mockito.doReturn(uah).`when`(userService).checkPassword(user.login, password)
 
         mockMvc.perform(post("/api/login")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(objectMapper.writeValueAsString(mapOf("login" to user.login, "password" to password))))
+                .jsonContent(mapOf("login" to user.login, "password" to password)))
                 .andExpect(MockMvcResultMatchers.status().isOk)
-                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(user)))
+                .andExpect(jsonMatcher(user))
                 .andDo {
                     val userFromSession = it.request.session?.user()
                     assertThat(userFromSession).isEqualTo(user)
@@ -87,8 +84,7 @@ class AuthenticationControllerTest {
 
     @Test
     fun logout() {
-        mockMvc.perform(post("/api/logout")
-                .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/api/logout"))
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andDo {
                     assertThat(it.request.session?.user()).isNull()
@@ -99,24 +95,11 @@ class AuthenticationControllerTest {
 
     @Test
     fun user() {
-        val user = User(1, "login")
-        val uah = UserWithHashedPassword(user, "hash")
-        val password = "password"
-        Mockito.doReturn(uah).`when`(userService).checkPassword(user.login, password)
-        Mockito.doReturn(true).`when`(userService).checkSessionIsStillValid(user.login, uah.hashedPassword)
+        val (session, user) = doLogin()
 
-        val session = MockHttpSession()
-
-        mockMvc.perform(post("/api/login")
-                .session(session)
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(objectMapper.writeValueAsString(mapOf("login" to user.login, "password" to password))))
+        mockMvc.perform(get("/api/user").session(session))
                 .andExpect(MockMvcResultMatchers.status().isOk)
-
-        mockMvc.perform(get("/api/user")
-                .session(session))
-                .andExpect(MockMvcResultMatchers.status().isOk)
-                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(user)))
+                .andExpect(jsonMatcher(user))
                 .andDo {
                     val userFromSession = it.request.session?.user()
                     assertThat(userFromSession).isEqualTo(user)
