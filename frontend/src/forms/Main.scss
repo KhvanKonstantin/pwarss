@@ -40,6 +40,9 @@
 
     > .content {
         margin-top: 2em;
+
+        overflow: auto;
+        height: calc(100vh - 2em);
     }
 
     .menu {
