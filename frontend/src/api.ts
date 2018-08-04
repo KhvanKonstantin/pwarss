@@ -1,7 +1,7 @@
 // Created by Konstantin Khvan on 7/11/18 2:05 PM
 
 import {User} from "./model/User";
-import {NewsEntry} from "./model/NewsEntry";
+import {IdType, NewsEntry} from "./model/NewsEntry";
 
 export class GenericResponse {
     success: boolean
@@ -53,13 +53,14 @@ const api = {
     },
 
     entry: {
-        findById: (id: number) => getJson<NewsEntry>("/entries/" + id),
-        findAll: (limit: number) => getJson<Array<NewsEntry>>("/entries", {limit}),
-        findUnread: (limit: number) => getJson<Array<NewsEntry>>("/unread", {limit}),
-        findMarked: (limit: number) => getJson<Array<NewsEntry>>("/marked", {limit}),
+        findById: (id: IdType) => getJson<NewsEntry>("entries/" + id),
+        findAll: (limit: number) => getJson<Array<NewsEntry>>("entries", {limit}),
+        findUnread: (limit: number) => getJson<Array<NewsEntry>>("unread", {limit}),
+        findMarked: (limit: number) => getJson<Array<NewsEntry>>("marked", {limit}),
+        markAllRead: (maxId: IdType) => postJson<GenericResponse>("unread/readAll", {maxId}),
 
-        markEntry: (id: number, mark: boolean) => postJson<GenericResponse>(`/entries/${id}/mark`, {mark}),
-        markEntryRead: (id: number, read: boolean) => postJson<GenericResponse>(`/entries/${id}/read`, {read})
+        markEntry: (id: IdType, mark: boolean) => postJson<GenericResponse>(`entries/${id}/mark`, {mark}),
+        markEntryRead: (id: IdType, read: boolean) => postJson<GenericResponse>(`entries/${id}/read`, {read})
     }
 
 };

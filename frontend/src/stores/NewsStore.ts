@@ -1,8 +1,11 @@
 // Created by Konstantin Khvan on 7/23/18 2:43 PM
 
 import {IObservableArray, observable, runInAction} from "mobx";
-import {NewsEntry, NullEntry} from "../model/NewsEntry";
+import {IdType, NewsEntry, NullEntry} from "../model/NewsEntry";
 import api from "../api";
+
+
+const ENTRIES_PER_REQUEST = 200;
 
 export default class NewsStore {
 
@@ -10,7 +13,7 @@ export default class NewsStore {
 
     async updateNews(): Promise<any> {
         try {
-            let newsEntries = await api.entry.findAll(200);
+            let newsEntries = await api.entry.findAll(ENTRIES_PER_REQUEST);
             runInAction(() => {
                 this.latestNews.replace(newsEntries);
             });
@@ -20,15 +23,15 @@ export default class NewsStore {
         return "refreshed";
     }
 
-    entryById(newsEntryId: number): NewsEntry {
+    entryById(newsEntryId: IdType): NewsEntry {
         const entry = this.latestNews.find(function (entry) {
-            return newsEntryId === entry.id
+            return newsEntryId == entry.id
         });
 
         return entry ? entry : NullEntry;
     }
 
-    async toggleEntryMark(id: number) {
+    async toggleEntryMark(id: IdType) {
         try {
             const entry = this.entryById(id);
             if (entry.id != NullEntry.id) {
@@ -44,7 +47,7 @@ export default class NewsStore {
         }
     }
 
-    async markEntryRead(id: number, read: boolean) {
+    async markEntryRead(id: IdType, read: boolean) {
         try {
             const entry = this.entryById(id);
             if (entry.id != NullEntry.id) {
@@ -55,6 +58,20 @@ export default class NewsStore {
                     });
                 }
             }
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    async markAllRead() {
+        try {
+            if (this.latestNews.length <= 0) {
+                return
+            }
+
+            let maxId = this.latestNews[0].id;
+            await api.entry.markAllRead(maxId);
+            await this.updateNews();
         } catch (e) {
             console.log(e)
         }

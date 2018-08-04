@@ -118,4 +118,13 @@ class EntriesServiceTtrss(private val jdbcTemplate: JdbcTemplate, config: PwaRss
 
         return jdbcTemplate.update(query, !read, ownerId, entryId) > 0
     }
+
+    fun readAll(ownerId: Long, maxId: Long): Boolean {
+        val query = """UPDATE ttrss_user_entries
+                       SET unread = FALSE
+                       WHERE owner_uid = ?
+                         AND ref_id <= ?"""
+
+        return jdbcTemplate.update(query, ownerId, maxId) > 0
+    }
 }

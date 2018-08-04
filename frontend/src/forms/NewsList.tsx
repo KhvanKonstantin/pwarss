@@ -4,7 +4,7 @@ import * as React from "react";
 import {MouseEvent} from "react";
 import {inject, observer} from "mobx-react";
 import NewsStore from "../stores/NewsStore";
-import {NewsEntry} from "../model/NewsEntry";
+import {IdType, NewsEntry} from "../model/NewsEntry";
 
 
 function newsEntry(entry: NewsEntry) {
@@ -14,36 +14,36 @@ function newsEntry(entry: NewsEntry) {
 
     return <li key={id}>
         <div className={`mark ${markCN}`} data-mark={id}>★</div>
-        <div className={`title ${readCN}`} data-title={id}>{title}</div>
+        <div className={`title ${readCN}`} data-id={id}>{title}</div>
     </li>;
 }
 
 export interface NewsEntryListProps {
     newsStore?: NewsStore
-    onMarkClicked: (id: number) => any
-    onTitleClicked: (id: number) => any
+    onMarkClicked: (id: IdType) => any
+    onTitleClicked: (id: IdType) => any
 }
 
 @inject("newsStore")
 @observer
 export default class NewsEntryList extends React.Component<NewsEntryListProps> {
-    componentDidMount() {
+    private updateNews = () => {
         const newsStore = this.props.newsStore!;
         newsStore.updateNews();
-    }
+    };
 
     private onClick = (event: MouseEvent) => {
         const target = event.target as HTMLElement;
 
         const mark = target.dataset.mark;
         if (mark) {
-            this.props.onMarkClicked(parseInt(mark, 10));
+            this.props.onMarkClicked(mark);
             return
         }
 
-        const title = target.dataset.title;
-        if (title) {
-            this.props.onTitleClicked(parseInt(title, 10));
+        const id = target.dataset.id;
+        if (id) {
+            this.props.onTitleClicked(id);
             return
         }
     };
@@ -56,7 +56,7 @@ export default class NewsEntryList extends React.Component<NewsEntryListProps> {
             <ul onClick={this.onClick}>
                 {latestNews.map(newsEntry)}
             </ul>
-            <div className="refresh">
+            <div className="refresh" onClick={this.updateNews}>
                 <div>↻</div>
             </div>
         </div>

@@ -6,6 +6,7 @@ import NewsEntryList from "./NewsList";
 import SingleNewsEntry from "./SingleNewsEntry";
 import {inject} from "mobx-react/custom";
 import NewsStore from "../stores/NewsStore";
+import {IdType} from "../model/NewsEntry";
 
 export interface RootProps {
     newsStore?: NewsStore
@@ -13,7 +14,7 @@ export interface RootProps {
 }
 
 interface RootState {
-    newsEntryId: number | null;
+    newsEntryId: IdType | null;
     showLeftMenu: boolean;
     showRightMenu: boolean;
 }
@@ -27,6 +28,11 @@ export default class Main extends React.Component<RootProps, RootState> {
         showLeftMenu: false,
         showRightMenu: false
     };
+
+    componentDidMount() {
+        const newsStore = this.props.newsStore!;
+        newsStore.updateNews();
+    }
 
     private logout = () => {
         this.props.doLogout();
@@ -44,39 +50,49 @@ export default class Main extends React.Component<RootProps, RootState> {
         this.setState(prevState => ({...hideAllMenus, showRightMenu: !prevState.showRightMenu}));
     };
 
-    private showNewsEntry = (id: number) => {
+    private showNewsEntry = (id: IdType) => {
         const newsStore = this.props.newsStore!;
         newsStore.markEntryRead(id, true);
         this.setState({...hideAllMenus, newsEntryId: id});
     };
 
-    // @ts-ignore
-    private markEntryRead = (id: number, read: boolean) => {
+    private markEntryRead = (id: IdType, read: boolean) => {
         const newsStore = this.props.newsStore!;
         newsStore.markEntryRead(id, read);
+        this.doHideAllMenus();
     };
 
-    private markEntry = (id: number) => {
+    private markEntry = (id: IdType) => {
         const newsStore = this.props.newsStore!;
         newsStore.toggleEntryMark(id);
     };
 
+    private markAllRead = () => {
+        const newsStore = this.props.newsStore!;
+        newsStore.markAllRead();
+        this.doHideAllMenus();
+    };
+
     private doHideAllMenus = () => {
-        console.log("on down");
         this.setState(hideAllMenus);
     };
 
     render() {
         let content = null;
+        let rightMenu = null;
+
         const newsEntryId: number | null = this.state.newsEntryId;
         const showEntry = newsEntryId != null;
 
         if (newsEntryId != null) {
             const newsStore = this.props.newsStore!;
             content = <SingleNewsEntry entry={newsStore.entryById(newsEntryId)}
-                                       onMarkClicked={this.markEntry}/>
+                                       onMarkClicked={this.markEntry}/>;
+            rightMenu = <div className="menu-item"
+                             onClick={() => this.markEntryRead(newsEntryId, false)}>Mark unread</div>
         } else {
             content = <NewsEntryList onMarkClicked={this.markEntry} onTitleClicked={this.showNewsEntry}/>;
+            rightMenu = <div className="menu-item" onClick={this.markAllRead}>Mark all read</div>
         }
 
         const {showLeftMenu, showRightMenu} = this.state;
@@ -100,8 +116,7 @@ export default class Main extends React.Component<RootProps, RootState> {
                     <div className="item">
                         <div onClick={this.toggleRightMenu}>⋮</div>
                         <div className={`menu right ${showRightMenu ? "active" : ""}`}>
-                            {!showEntry && <div className="menu-item">Mark all read</div>}
-                            {showEntry && <div className="menu-item">Mark unread</div>}
+                            {rightMenu}
                         </div>
                     </div>
                 </div>

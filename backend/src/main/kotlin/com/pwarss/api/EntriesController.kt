@@ -44,12 +44,21 @@ class EntriesController(private val entriesService: EntriesServiceTtrss) {
         return ResponseEntity.ok(entries)
     }
 
+    class ReadAllRequest(val maxId: Long?)
+
+    @PostMapping("/unread/readAll")
+    fun readAll(@RequestBody req: ReadAllRequest, user: User): ResponseEntity<GenericResponse> {
+        val maxId = req.maxId ?: throw IllegalArgumentException()
+        val anyUpdatedRows = entriesService.readAll(user.id, maxId)
+        return ResponseEntity.ok(GenericResponse(anyUpdatedRows))
+    }
+
     class GenericResponse(val success: Boolean)
 
-    class MarkEntryFormData(val mark: Boolean?)
+    class MarkEntryRequest(val mark: Boolean?)
 
     @PostMapping("/entries/{id}/mark", consumes = [MediaType.APPLICATION_JSON_UTF8_VALUE], produces = [MediaType.APPLICATION_JSON_UTF8_VALUE])
-    fun markEntry(@PathVariable("id") id: Long, @RequestBody form: MarkEntryFormData, user: User): ResponseEntity<GenericResponse> {
+    fun markEntry(@PathVariable("id") id: Long, @RequestBody form: MarkEntryRequest, user: User): ResponseEntity<GenericResponse> {
         val success = entriesService.markEntry(user.id, id, form.mark ?: true)
         return ResponseEntity.ok(GenericResponse(success))
     }

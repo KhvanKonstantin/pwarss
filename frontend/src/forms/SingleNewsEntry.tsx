@@ -1,13 +1,13 @@
 // Created by Konstantin Khvan on 7/23/18 6:00 PM
 
 import * as React from "react";
-import {NewsEntry} from "../model/NewsEntry";
+import {IdType, NewsEntry} from "../model/NewsEntry";
 import {extractTextFromHtmlString} from "./util";
 import {observer} from "mobx-react";
 
 export interface SingleNewsEntryProps {
     entry: NewsEntry
-    onMarkClicked: (id: number) => any
+    onMarkClicked: (id: IdType) => any
 }
 
 @observer

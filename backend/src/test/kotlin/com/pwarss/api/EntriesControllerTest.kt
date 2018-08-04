@@ -20,6 +20,7 @@ import org.springframework.http.MediaType
 import org.springframework.mock.web.MockHttpSession
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
@@ -42,6 +43,11 @@ class EntriesControllerTest {
     @MockBean
     lateinit var entriesService: EntriesServiceTtrss
 
+    private fun jsonMatcher(obj: Any) = MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(obj))
+
+    private fun MockHttpServletRequestBuilder.jsonContent(obj: Any) = this
+            .contentType(MediaType.APPLICATION_JSON_UTF8)
+            .content(objectMapper.writeValueAsString(obj))
 
     private fun doLogin(): Pair<MockHttpSession, User> {
         val user = User(1, "login")
@@ -55,8 +61,7 @@ class EntriesControllerTest {
 
         mockMvc.perform(post("/api/login")
                 .session(session)
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(objectMapper.writeValueAsString(mapOf("login" to user.login, "password" to password))))
+                .jsonContent(mapOf("login" to user.login, "password" to password)))
                 .andExpect(status().isOk)
 
         return session to user
@@ -82,7 +87,7 @@ class EntriesControllerTest {
 
         mockMvc.perform(get("/api/entries/1").session(session))
                 .andExpect(status().isOk)
-                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(EMPTY_ENTRY)))
+                .andExpect(jsonMatcher(EMPTY_ENTRY))
     }
 
     @Test
@@ -94,7 +99,7 @@ class EntriesControllerTest {
 
         mockMvc.perform(get("/api/entries").session(session))
                 .andExpect(status().isOk)
-                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(entries)))
+                .andExpect(jsonMatcher(entries))
     }
 
     @Test
@@ -106,7 +111,7 @@ class EntriesControllerTest {
 
         mockMvc.perform(get("/api/unread").session(session))
                 .andExpect(status().isOk)
-                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(entries)))
+                .andExpect(jsonMatcher(entries))
     }
 
     @Test
@@ -118,6 +123,51 @@ class EntriesControllerTest {
 
         mockMvc.perform(get("/api/marked").session(session))
                 .andExpect(status().isOk)
-                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(entries)))
+                .andExpect(jsonMatcher(entries))
     }
+
+    @Test
+    fun readAll() {
+        val (session, user) = doLogin()
+
+        val maxId = 1L
+
+        Mockito.doReturn(true).`when`(entriesService).readAll(Mockito.eq(user.id), Mockito.eq(maxId))
+
+        mockMvc.perform(post("/api/unread/readAll").session(session)
+                .jsonContent(EntriesController.ReadAllRequest(maxId)))
+                .andExpect(status().isOk)
+                .andExpect(jsonMatcher(EntriesController.GenericResponse(true)))
+    }
+
+    @Test
+    fun markEntry() {
+        val (session, user) = doLogin()
+
+        val id = 1L
+        val mark = true
+
+        Mockito.doReturn(true).`when`(entriesService).markEntry(Mockito.eq(user.id), Mockito.eq(id), Mockito.eq(mark))
+
+        mockMvc.perform(post("/api/entries/$id/mark").session(session)
+                .jsonContent(EntriesController.MarkEntryRequest(mark)))
+                .andExpect(status().isOk)
+                .andExpect(jsonMatcher(EntriesController.GenericResponse(true)))
+    }
+
+    @Test
+    fun markEntryRead() {
+        val (session, user) = doLogin()
+
+        val id = 1L
+        val read = true
+
+        Mockito.doReturn(true).`when`(entriesService).markEntryRead(Mockito.eq(user.id), Mockito.eq(id), Mockito.eq(read))
+
+        mockMvc.perform(post("/api/entries/$id/read").session(session)
+                .jsonContent(EntriesController.MarkEntryReadFormData(read)))
+                .andExpect(status().isOk)
+                .andExpect(jsonMatcher(EntriesController.GenericResponse(true)))
+    }
+
 }

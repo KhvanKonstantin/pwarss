@@ -1,7 +1,10 @@
 // Created by Konstantin Khvan on 7/16/18 9:24 AM
 
+
+export type IdType = string
+
 export class NewsEntry {
-    id: number;
+    id: IdType;
     read: boolean;
     marked: boolean;
     link: string;
@@ -11,7 +14,7 @@ export class NewsEntry {
 }
 
 export const NullEntry: NewsEntry = {
-    id: -1,
+    id: "-1",
     read: true,
     marked: false,
     link: "",

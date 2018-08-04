@@ -6,6 +6,7 @@ import com.pwarss.PwarssApplication
 import com.pwarss.testutil.DefaultTestPropertiesSource
 import com.pwarss.testutil.TestProperties
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -71,5 +72,17 @@ class EntriesServiceTest {
 
         entriesService.markEntryRead(ownerId, latestEntry.id, false)
         assertThat(entriesService.findEntryById(ownerId, latestEntry.id)?.read).isFalse()
+    }
+
+    @Test
+    @Ignore("This is destructive test disabled by default")
+    fun readAll() {
+        val latestEntry = entriesService.findEntries(ownerId, 10).first()
+
+        entriesService.markEntryRead(ownerId, latestEntry.id, true)
+        assertThat(entriesService.findEntryById(ownerId, latestEntry.id)?.read).isTrue()
+
+        entriesService.readAll(ownerId, latestEntry.id)
+        assertThat(entriesService.findEntries(ownerId, 10).all { it.read }).isTrue()
     }
 }
