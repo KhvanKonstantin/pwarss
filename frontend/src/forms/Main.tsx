@@ -2,11 +2,13 @@
 
 
 import * as React from 'react';
+import {ReactNode} from 'react';
 import NewsEntryList from "./NewsList";
 import SingleNewsEntry from "./SingleNewsEntry";
 import {inject} from "mobx-react/custom";
 import NewsStore from "../stores/NewsStore";
 import {IdType} from "../model/NewsEntry";
+import {Confirm} from "./util";
 
 export interface RootProps {
     newsStore?: NewsStore
@@ -17,16 +19,19 @@ interface RootState {
     newsEntryId: IdType | null;
     showLeftMenu: boolean;
     showRightMenu: boolean;
+    showConfirmReadAll: boolean;
 }
 
 const hideAllMenus = {showLeftMenu: false, showRightMenu: false};
+const hideAllConfirms = {showConfirmReadAll: false};
 
 @inject("newsStore")
 export default class Main extends React.Component<RootProps, RootState> {
     state = {
         newsEntryId: null,
         showLeftMenu: false,
-        showRightMenu: false
+        showRightMenu: false,
+        showConfirmReadAll: false
     };
 
     componentDidMount() {
@@ -67,19 +72,31 @@ export default class Main extends React.Component<RootProps, RootState> {
         newsStore.toggleEntryMark(id);
     };
 
+    private confirmMarkAllRead = () => {
+        this.setState({showConfirmReadAll: true});
+        this.doHideAllMenus();
+    };
+
     private markAllRead = () => {
         const newsStore = this.props.newsStore!;
         newsStore.markAllRead();
-        this.doHideAllMenus();
+        this.doHideAllConfirms();
     };
 
     private doHideAllMenus = () => {
         this.setState(hideAllMenus);
     };
 
+    private doHideAllConfirms = () => {
+        this.doHideAllMenus();
+        this.setState(hideAllConfirms);
+    };
+
     render() {
-        let content = null;
-        let rightMenu = null;
+        const {showLeftMenu, showRightMenu, showConfirmReadAll} = this.state;
+
+        let content: ReactNode | null = null;
+        let rightMenu: ReactNode | null = null;
 
         const newsEntryId: number | null = this.state.newsEntryId;
         const showEntry = newsEntryId != null;
@@ -92,10 +109,18 @@ export default class Main extends React.Component<RootProps, RootState> {
                              onClick={() => this.markEntryRead(newsEntryId, false)}>Mark unread</div>
         } else {
             content = <NewsEntryList onMarkClicked={this.markEntry} onTitleClicked={this.showNewsEntry}/>;
-            rightMenu = <div className="menu-item" onClick={this.markAllRead}>Mark all read</div>
+            rightMenu = <div className="menu-item" onClick={this.confirmMarkAllRead}>Mark all read</div>
         }
 
-        const {showLeftMenu, showRightMenu} = this.state;
+        let confirmModal: ReactNode | null = null;
+
+        if (showConfirmReadAll) {
+            confirmModal = <Confirm content="Mark all read?"
+                                    textOk="Mark read"
+                                    textCancel="Cancel"
+                                    onOk={this.markAllRead}
+                                    onCancel={this.doHideAllConfirms}/>
+        }
 
         const topLeftButton = showEntry
             ? <div className="item" onClick={this.back}><b>←</b></div>
@@ -117,6 +142,7 @@ export default class Main extends React.Component<RootProps, RootState> {
                         <div onClick={this.toggleRightMenu}>⋮</div>
                         <div className={`menu right ${showRightMenu ? "active" : ""}`}>
                             {rightMenu}
+                            {confirmModal}
                         </div>
                     </div>
                 </div>
