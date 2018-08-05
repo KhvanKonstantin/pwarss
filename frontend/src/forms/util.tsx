@@ -21,6 +21,9 @@ export function extractTextFromHtmlString(html: string) {
     return (new DOMParser).parseFromString(html, "text/html").documentElement.textContent;
 }
 
+
+const MAX_SHOW_SPINNER_DELAY = 300;
+
 export function withLoading(component: React.Component<any, { loading: boolean }>, block: () => Promise<any>) {
     let done = false;
     const markDone = function () {
@@ -41,7 +44,7 @@ export function withLoading(component: React.Component<any, { loading: boolean }
                 }
             });
         }
-    }, 100);
+    }, MAX_SHOW_SPINNER_DELAY);
 }
 
 function Spinner() {
