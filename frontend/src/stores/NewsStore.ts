@@ -59,15 +59,32 @@ export default class NewsStore {
         return entry ? entry : NullEntry;
     }
 
+    replaceEntry(entry?: NewsEntry | null) {
+        if (!entry) {
+            return
+        }
+        const id = entry.id;
+
+        runInAction(() => {
+            [this.latest, this.unread, this.starred].forEach(function (entriesList) {
+                const index = entriesList.findIndex(function (entry) {
+                    return id == entry.id
+                });
+
+                if (index != -1) {
+                    entriesList[index] = entry
+                }
+            })
+        })
+    }
+
     async toggleEntryMark(id: IdType) {
         try {
             const entry = this.entryById(id);
             if (entry.id != NullEntry.id) {
-                let {success} = await api.entry.markEntry(id, !entry.marked);
+                let {success, entry: updatedEntry} = await api.entry.markEntry(id, !entry.marked);
                 if (success) {
-                    runInAction(() => {
-                        entry.marked = !entry.marked;
-                    });
+                    this.replaceEntry(updatedEntry)
                 }
             }
         } catch (e) {
@@ -79,11 +96,9 @@ export default class NewsStore {
         try {
             const entry = this.entryById(id);
             if (entry.id != NullEntry.id) {
-                let {success} = await api.entry.markEntryRead(id, read);
+                let {success, entry: updatedEntry} = await api.entry.markEntryRead(id, read);
                 if (success) {
-                    runInAction(() => {
-                        entry.read = read;
-                    });
+                    this.replaceEntry(updatedEntry)
                 }
             }
         } catch (e) {

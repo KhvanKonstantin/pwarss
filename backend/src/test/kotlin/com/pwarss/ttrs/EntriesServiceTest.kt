@@ -55,23 +55,30 @@ class EntriesServiceTest {
     fun markEntry() {
         val latestEntry = entriesService.findEntries(ownerId, 10).first()
 
-        entriesService.markEntry(ownerId, latestEntry.id, true)
+        entriesService.markEntry(ownerId, latestEntry.id, true).let { (success, newsEntry) ->
+            assertThat(success).isTrue()
+            assertThat(newsEntry?.marked).isTrue()
+        }
 
-        assertThat(entriesService.findEntryById(ownerId, latestEntry.id)?.marked).isTrue()
-
-        entriesService.markEntry(ownerId, latestEntry.id, false)
-        assertThat(entriesService.findEntryById(ownerId, latestEntry.id)?.marked).isFalse()
+        entriesService.markEntry(ownerId, latestEntry.id, false).let { (success, newsEntry) ->
+            assertThat(success).isTrue()
+            assertThat(newsEntry?.marked).isFalse()
+        }
     }
 
     @Test
     fun markEntryRead() {
         val latestEntry = entriesService.findEntries(ownerId, 10).first()
 
-        entriesService.markEntryRead(ownerId, latestEntry.id, true)
-        assertThat(entriesService.findEntryById(ownerId, latestEntry.id)?.read).isTrue()
+        entriesService.markEntryRead(ownerId, latestEntry.id, true).let { (success, newsEntry) ->
+            assertThat(success).isTrue()
+            assertThat(newsEntry?.read).isTrue()
+        }
 
-        entriesService.markEntryRead(ownerId, latestEntry.id, false)
-        assertThat(entriesService.findEntryById(ownerId, latestEntry.id)?.read).isFalse()
+        entriesService.markEntryRead(ownerId, latestEntry.id, false).let { (success, newsEntry) ->
+            assertThat(success).isTrue()
+            assertThat(newsEntry?.read).isFalse()
+        }
     }
 
     @Test

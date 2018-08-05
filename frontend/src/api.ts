@@ -7,6 +7,10 @@ export class GenericResponse {
     success: boolean
 }
 
+export class GenericResponseWithEntry extends GenericResponse {
+    entry?: NewsEntry | null
+}
+
 function encodeToQuery(params: { [name: string]: any }): string {
     if (params) {
         return "?" + Object.keys(params)
@@ -59,8 +63,8 @@ const api = {
         findMarked: (limit: number) => getJson<Array<NewsEntry>>("marked", {limit}),
         markAllRead: (maxId: IdType) => postJson<GenericResponse>("unread/readAll", {maxId}),
 
-        markEntry: (id: IdType, mark: boolean) => postJson<GenericResponse>(`entries/${id}/mark`, {mark}),
-        markEntryRead: (id: IdType, read: boolean) => postJson<GenericResponse>(`entries/${id}/read`, {read})
+        markEntry: (id: IdType, mark: boolean) => postJson<GenericResponseWithEntry>(`entries/${id}/mark`, {mark}),
+        markEntryRead: (id: IdType, read: boolean) => postJson<GenericResponseWithEntry>(`entries/${id}/read`, {read})
     }
 
 };

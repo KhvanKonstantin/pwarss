@@ -117,7 +117,7 @@ class EntriesControllerTest : MockMvcAuthSupport {
         val id = 1L
         val mark = true
 
-        Mockito.doReturn(true).`when`(entriesService).markEntry(Mockito.eq(user.id), Mockito.eq(id), Mockito.eq(mark))
+        Mockito.doReturn(true to EMPTY_ENTRY).`when`(entriesService).markEntry(Mockito.eq(user.id), Mockito.eq(id), Mockito.eq(mark))
 
         mockMvc.perform(post("/api/entries/$id/mark").session(session)
                 .jsonContent(EntriesController.MarkEntryRequest(mark)))
@@ -132,10 +132,10 @@ class EntriesControllerTest : MockMvcAuthSupport {
         val id = 1L
         val read = true
 
-        Mockito.doReturn(true).`when`(entriesService).markEntryRead(Mockito.eq(user.id), Mockito.eq(id), Mockito.eq(read))
+        Mockito.doReturn(true to EMPTY_ENTRY).`when`(entriesService).markEntryRead(Mockito.eq(user.id), Mockito.eq(id), Mockito.eq(read))
 
         mockMvc.perform(post("/api/entries/$id/read").session(session)
-                .jsonContent(EntriesController.MarkEntryReadFormData(read)))
+                .jsonContent(EntriesController.MarkEntryReadRequest(read)))
                 .andExpect(status().isOk)
                 .andExpect(jsonMatcher(EntriesController.GenericResponse(true)))
     }
