@@ -38,7 +38,7 @@ export default class NewsEntryList extends React.Component<NewsEntryListProps> {
 
         const starId = target.dataset.starId;
         if (starId) {
-            this.props.onStarClicked(starId, !(target.dataset.starred == "starred"));
+            this.props.onStarClicked(starId, !(target.dataset.star == "starred"));
             return
         }
 
