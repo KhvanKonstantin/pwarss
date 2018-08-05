@@ -17,6 +17,8 @@
     }
 
     .star {
+        user-select: none;
+
         color: lightgrey;
 
         &.starred {
