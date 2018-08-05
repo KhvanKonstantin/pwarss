@@ -8,7 +8,7 @@ import SingleNewsEntry from "./SingleNewsEntry";
 import {inject} from "mobx-react/custom";
 import NewsStore, {NEWS_FILTER} from "../stores/NewsStore";
 import {IdType} from "../model/NewsEntry";
-import {Confirm} from "./util";
+import {Confirm, ModalSpinner, withLoading} from "./util";
 
 export interface RootProps {
     newsStore?: NewsStore
@@ -21,25 +21,34 @@ interface RootState {
     showLeftMenu: boolean
     showRightMenu: boolean
     showConfirmReadAll: boolean
+    loading: boolean
 }
 
 const hideAllMenus = {showLeftMenu: false, showRightMenu: false};
 const hideAllConfirms = {showConfirmReadAll: false};
 
+
 @inject("newsStore")
 export default class Main extends React.Component<RootProps, RootState> {
     state = {
         newsEntryId: null,
-        newsFilter: NEWS_FILTER.UNREAD,
+        newsFilter: NEWS_FILTER.ALL,
         showLeftMenu: false,
         showRightMenu: false,
-        showConfirmReadAll: false
+        showConfirmReadAll: false,
+        loading: false
     };
 
     componentDidMount() {
-        const newsStore = this.props.newsStore!;
-        newsStore.updateNews();
+        this.updateAllNews();
     }
+
+    private updateAllNews = () => {
+        withLoading(this, async () => {
+            const newsStore = this.props.newsStore!;
+            await newsStore.updateNews();
+        });
+    };
 
     private logout = () => {
         this.props.doLogout();
@@ -76,14 +85,18 @@ export default class Main extends React.Component<RootProps, RootState> {
     };
 
     private readEntry = (id: IdType, read: boolean) => {
-        const newsStore = this.props.newsStore!;
-        newsStore.readEntry(id, read);
-        this.doHideAllMenus();
+        withLoading(this, async () => {
+            const newsStore = this.props.newsStore!;
+            this.doHideAllMenus();
+            await newsStore.readEntry(id, read);
+        });
     };
 
     private starEntry = (id: IdType, star: boolean) => {
-        const newsStore = this.props.newsStore!;
-        newsStore.starEntry(id, star);
+        withLoading(this, async () => {
+            const newsStore = this.props.newsStore!;
+            await newsStore.starEntry(id, star);
+        });
     };
 
     private confirmReadAll = () => {
@@ -92,9 +105,11 @@ export default class Main extends React.Component<RootProps, RootState> {
     };
 
     private readAll = () => {
-        const newsStore = this.props.newsStore!;
-        newsStore.readAll();
-        this.doHideAllConfirms();
+        withLoading(this, async () => {
+            const newsStore = this.props.newsStore!;
+            this.doHideAllConfirms();
+            await newsStore.readAll();
+        });
     };
 
     private doHideAllMenus = () => {
@@ -123,7 +138,9 @@ export default class Main extends React.Component<RootProps, RootState> {
                              onClick={() => this.readEntry(newsEntryId, false)}>Mark unread</div>
         } else {
             content = <NewsEntryList newsFilter={newsFilter}
-                                     onStarClicked={this.starEntry} onTitleClicked={this.showNewsEntry}/>;
+                                     onRefreshedClicked={this.updateAllNews}
+                                     onStarClicked={this.starEntry}
+                                     onTitleClicked={this.showNewsEntry}/>;
             rightMenu = <div className="menu-item" onClick={this.confirmReadAll}>Mark all read</div>
         }
 
@@ -164,6 +181,8 @@ export default class Main extends React.Component<RootProps, RootState> {
                 <div className="content" onMouseDown={this.doHideAllMenus} onTouchStart={this.doHideAllMenus}>
                     {content}
                 </div>
+
+                {this.state.loading && <ModalSpinner/>}
             </div>
         );
     }

@@ -23,15 +23,12 @@ export interface NewsEntryListProps {
     newsFilter: NEWS_FILTER
     onStarClicked: (id: IdType, star: boolean) => any
     onTitleClicked: (id: IdType) => any
+    onRefreshedClicked: () => any
 }
 
 @inject("newsStore")
 @observer
 export default class NewsEntryList extends React.Component<NewsEntryListProps> {
-    private updateNews = () => {
-        const newsStore = this.props.newsStore!;
-        newsStore.updateNews();
-    };
 
     private onClick = (event: MouseEvent) => {
         const target = event.target as HTMLElement;
@@ -53,11 +50,12 @@ export default class NewsEntryList extends React.Component<NewsEntryListProps> {
     render() {
         const newsStore = this.props.newsStore!;
         const latestNews = newsStore.newsToShow(this.props.newsFilter);
+
         return <div className="news-list">
             <ul onClick={this.onClick}>
                 {latestNews.map(newsEntry)}
             </ul>
-            <div className="refresh" onClick={this.updateNews}>
+            <div className="refresh" onClick={this.props.onRefreshedClicked}>
                 <div>↻</div>
             </div>
         </div>
