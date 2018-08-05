@@ -3,17 +3,24 @@
 import * as React from "react";
 import {IdType, NewsEntry} from "../model/NewsEntry";
 import {extractTextFromHtmlString} from "./util";
-import {observer} from "mobx-react";
+import {inject, observer} from "mobx-react";
+import NewsStore from "../stores/NewsStore";
 
 export interface SingleNewsEntryProps {
+    newsStore?: NewsStore
     entry: NewsEntry
     onStarClicked: (id: IdType, star: boolean) => any
 }
 
+@inject("newsStore")
 @observer
 class SingleNewsEntry extends React.Component<SingleNewsEntryProps> {
     render() {
-        const {entry, onStarClicked} = this.props;
+        const {entry: entryFromProps, onStarClicked} = this.props;
+
+        // entries are replaced as array elements so observe whole array to receive updates
+        const newsStore = this.props.newsStore!;
+        const entry = newsStore.entryById(entryFromProps.id);
 
         const {id, title, starred, link, content, date} = entry;
 
