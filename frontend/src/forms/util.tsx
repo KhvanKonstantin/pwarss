@@ -21,11 +21,27 @@ export function extractTextFromHtmlString(html: string) {
     return (new DOMParser).parseFromString(html, "text/html").documentElement.textContent;
 }
 
-export function withLoading(component: React.Component<any, { loading: boolean }>, body: () => Promise<any>) {
-    component.setState({loading: true}, async () => {
-        await body();
-        component.setState({loading: false})
-    });
+export function withLoading(component: React.Component<any, { loading: boolean }>, block: () => Promise<any>) {
+    let done = false;
+    const markDone = function () {
+        return done = true;
+    };
+
+    const promise = block();
+
+    promise.then(markDone, markDone);
+
+    setTimeout(function () {
+        if (!done) {
+            component.setState({loading: true}, async () => {
+                try {
+                    await promise;
+                } finally {
+                    component.setState({loading: false})
+                }
+            });
+        }
+    }, 100);
 }
 
 function Spinner() {
