@@ -49,11 +49,15 @@ export default class NewsEntryList extends React.Component<NewsEntryListProps> {
 
     render() {
         const newsStore = this.props.newsStore!;
-        const latestNews = newsStore.newsToShow(this.props.newsFilter);
+        const latestNews = newsStore
+            .newsToShow(this.props.newsFilter)
+            .map(newsEntry);
 
-        return <div className="news-list">
+        const empty = latestNews.length == 0;
+
+        return <div className={`news-list ${empty ? "empty" : ""}`}>
             <ul onClick={this.onClick}>
-                {latestNews.map(newsEntry)}
+                {empty ? <div className="no-entries">No entries</div> : latestNews}
             </ul>
             <div className="refresh" onClick={this.props.onRefreshedClicked}>
                 <div>↻</div>
