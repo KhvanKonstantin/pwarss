@@ -13,15 +13,13 @@
             padding: 2px;
             border-bottom: 1px solid lightgrey;
 
-            .mark {
+            .star {
                 font-weight: bold;
                 margin: 0 5px 0 0;
 
-                &.notmarked {
-                    color: lightgrey;
-                }
+                color: lightgrey;
 
-                &.marked {
+                &.starred {
                     color: gold;
                 }
             }

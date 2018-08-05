@@ -47,35 +47,35 @@ class EntriesServiceTest {
     @Test
     fun runAllFinds() {
         entriesService.findEntries(ownerId, 50)
-        entriesService.findMarked(ownerId, 50)
+        entriesService.findStarred(ownerId, 50)
         entriesService.findUnread(ownerId, 50)
     }
 
     @Test
-    fun markEntry() {
+    fun starEntry() {
         val latestEntry = entriesService.findEntries(ownerId, 10).first()
 
-        entriesService.markEntry(ownerId, latestEntry.id, true).let { (success, newsEntry) ->
+        entriesService.starEntry(ownerId, latestEntry.id, true).let { (success, newsEntry) ->
             assertThat(success).isTrue()
-            assertThat(newsEntry?.marked).isTrue()
+            assertThat(newsEntry?.starred).isTrue()
         }
 
-        entriesService.markEntry(ownerId, latestEntry.id, false).let { (success, newsEntry) ->
+        entriesService.starEntry(ownerId, latestEntry.id, false).let { (success, newsEntry) ->
             assertThat(success).isTrue()
-            assertThat(newsEntry?.marked).isFalse()
+            assertThat(newsEntry?.starred).isFalse()
         }
     }
 
     @Test
-    fun markEntryRead() {
+    fun readEntry() {
         val latestEntry = entriesService.findEntries(ownerId, 10).first()
 
-        entriesService.markEntryRead(ownerId, latestEntry.id, true).let { (success, newsEntry) ->
+        entriesService.readEntry(ownerId, latestEntry.id, true).let { (success, newsEntry) ->
             assertThat(success).isTrue()
             assertThat(newsEntry?.read).isTrue()
         }
 
-        entriesService.markEntryRead(ownerId, latestEntry.id, false).let { (success, newsEntry) ->
+        entriesService.readEntry(ownerId, latestEntry.id, false).let { (success, newsEntry) ->
             assertThat(success).isTrue()
             assertThat(newsEntry?.read).isFalse()
         }
@@ -86,7 +86,7 @@ class EntriesServiceTest {
     fun readAll() {
         val latestEntry = entriesService.findEntries(ownerId, 10).first()
 
-        entriesService.markEntryRead(ownerId, latestEntry.id, true)
+        entriesService.readEntry(ownerId, latestEntry.id, true)
         assertThat(entriesService.findEntryById(ownerId, latestEntry.id)?.read).isTrue()
 
         entriesService.readAll(ownerId, latestEntry.id)

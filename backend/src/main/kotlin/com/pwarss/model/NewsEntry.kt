@@ -9,7 +9,7 @@ import java.sql.Date
  */
 data class NewsEntry(val id: Long,
                      val read: Boolean,
-                     val marked: Boolean,
+                     val starred: Boolean,
                      val link: String,
                      val title: String,
                      val date: Date,

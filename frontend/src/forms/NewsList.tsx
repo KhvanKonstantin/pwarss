@@ -8,12 +8,12 @@ import {IdType, NewsEntry} from "../model/NewsEntry";
 
 
 function newsEntry(entry: NewsEntry) {
-    const {id, title, marked, read} = entry;
+    const {id, title, starred, read} = entry;
     const readCN = read ? "" : "unread";
-    const markCN = !marked ? "notmarked" : "marked";
+    const starCN = !starred ? "" : "starred";
 
     return <li key={id}>
-        <div className={`mark ${markCN}`} data-mark={id}>★</div>
+        <div className={`star ${starCN}`} data-star-id={id} data-star={starCN}>★</div>
         <div className={`title ${readCN}`} data-id={id}>{title}</div>
     </li>;
 }
@@ -21,7 +21,7 @@ function newsEntry(entry: NewsEntry) {
 export interface NewsEntryListProps {
     newsStore?: NewsStore
     newsFilter: NEWS_FILTER
-    onMarkClicked: (id: IdType) => any
+    onStarClicked: (id: IdType, star: boolean) => any
     onTitleClicked: (id: IdType) => any
 }
 
@@ -36,9 +36,9 @@ export default class NewsEntryList extends React.Component<NewsEntryListProps> {
     private onClick = (event: MouseEvent) => {
         const target = event.target as HTMLElement;
 
-        const mark = target.dataset.mark;
-        if (mark) {
-            this.props.onMarkClicked(mark);
+        const starId = target.dataset.starId;
+        if (starId) {
+            this.props.onStarClicked(starId, !(target.dataset.starred == "starred"));
             return
         }
 

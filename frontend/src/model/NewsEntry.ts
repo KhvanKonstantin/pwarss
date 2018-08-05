@@ -6,7 +6,7 @@ export type IdType = string
 export class NewsEntry {
     id: IdType;
     read: boolean;
-    marked: boolean;
+    starred: boolean;
     link: string;
     title: string;
     date: string;
@@ -16,7 +16,7 @@ export class NewsEntry {
 export const NullEntry: NewsEntry = {
     id: "-1",
     read: true,
-    marked: false,
+    starred: false,
     link: "",
     title: "",
     date: "",

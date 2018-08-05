@@ -83,7 +83,7 @@ class EntriesServiceTtrss(private val jdbcTemplate: JdbcTemplate, config: PwaRss
         return jdbcTemplate.query(query, newsEntryMapper, ownerId, limit)
     }
 
-    fun findMarked(ownerId: Long, limit: Int): List<NewsEntry> {
+    fun findStarred(ownerId: Long, limit: Int): List<NewsEntry> {
         val limit = limit.coerceIn(10, maxEntries)
 
         val query = """SELECT e.id           AS id,
@@ -104,20 +104,20 @@ class EntriesServiceTtrss(private val jdbcTemplate: JdbcTemplate, config: PwaRss
     }
 
     @Transactional
-    fun markEntry(ownerId: Long, entryId: Long, mark: Boolean): Pair<Boolean, NewsEntry?> {
+    fun starEntry(ownerId: Long, entryId: Long, star: Boolean): Pair<Boolean, NewsEntry?> {
         val query = """UPDATE ttrss_user_entries
                        SET marked = ?
                        WHERE owner_uid = ?
                          AND ref_id = ?"""
 
-        val success = jdbcTemplate.update(query, mark, ownerId, entryId) > 0
+        val success = jdbcTemplate.update(query, star, ownerId, entryId) > 0
         val entry = findEntryById(ownerId, entryId)
 
         return success to entry
     }
 
     @Transactional
-    fun markEntryRead(ownerId: Long, entryId: Long, read: Boolean): Pair<Boolean, NewsEntry?> {
+    fun readEntry(ownerId: Long, entryId: Long, read: Boolean): Pair<Boolean, NewsEntry?> {
         val query = """UPDATE ttrss_user_entries
                        SET unread = ?
                        WHERE owner_uid = ?

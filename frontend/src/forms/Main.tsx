@@ -65,35 +65,35 @@ export default class Main extends React.Component<RootProps, RootState> {
         this.setState({...hideAllMenus, newsFilter: NEWS_FILTER.ALL});
     };
 
-    private showMarked = () => {
+    private showStarred = () => {
         this.setState({...hideAllMenus, newsFilter: NEWS_FILTER.STARRED});
     };
 
     private showNewsEntry = (id: IdType) => {
         const newsStore = this.props.newsStore!;
-        newsStore.markEntryRead(id, true);
+        newsStore.readEntry(id, true);
         this.setState({...hideAllMenus, newsEntryId: id});
     };
 
-    private markEntryRead = (id: IdType, read: boolean) => {
+    private readEntry = (id: IdType, read: boolean) => {
         const newsStore = this.props.newsStore!;
-        newsStore.markEntryRead(id, read);
+        newsStore.readEntry(id, read);
         this.doHideAllMenus();
     };
 
-    private markEntry = (id: IdType) => {
+    private starEntry = (id: IdType, star: boolean) => {
         const newsStore = this.props.newsStore!;
-        newsStore.toggleEntryMark(id);
+        newsStore.starEntry(id, star);
     };
 
-    private confirmMarkAllRead = () => {
+    private confirmReadAll = () => {
         this.setState({showConfirmReadAll: true});
         this.doHideAllMenus();
     };
 
-    private markAllRead = () => {
+    private readAll = () => {
         const newsStore = this.props.newsStore!;
-        newsStore.markAllRead();
+        newsStore.readAll();
         this.doHideAllConfirms();
     };
 
@@ -118,13 +118,13 @@ export default class Main extends React.Component<RootProps, RootState> {
         if (newsEntryId != null) {
             const newsStore = this.props.newsStore!;
             content = <SingleNewsEntry entry={newsStore.entryById(newsEntryId)}
-                                       onMarkClicked={this.markEntry}/>;
+                                       onStarClicked={this.starEntry}/>;
             rightMenu = <div className="menu-item"
-                             onClick={() => this.markEntryRead(newsEntryId, false)}>Mark unread</div>
+                             onClick={() => this.readEntry(newsEntryId, false)}>Mark unread</div>
         } else {
             content = <NewsEntryList newsFilter={newsFilter}
-                                     onMarkClicked={this.markEntry} onTitleClicked={this.showNewsEntry}/>;
-            rightMenu = <div className="menu-item" onClick={this.confirmMarkAllRead}>Mark all read</div>
+                                     onStarClicked={this.starEntry} onTitleClicked={this.showNewsEntry}/>;
+            rightMenu = <div className="menu-item" onClick={this.confirmReadAll}>Mark all read</div>
         }
 
         let confirmModal: ReactNode | null = null;
@@ -133,7 +133,7 @@ export default class Main extends React.Component<RootProps, RootState> {
             confirmModal = <Confirm content="Mark all read?"
                                     textOk="Mark read"
                                     textCancel="Cancel"
-                                    onOk={this.markAllRead}
+                                    onOk={this.readAll}
                                     onCancel={this.doHideAllConfirms}/>
         }
 
@@ -144,7 +144,7 @@ export default class Main extends React.Component<RootProps, RootState> {
                 <div className={`menu ${showLeftMenu ? "active" : ""}`}>
                     <div className="menu-item" onClick={this.showUnread}>Unread</div>
                     <div className="menu-item" onClick={this.showAll}>All entries</div>
-                    <div className="menu-item" onClick={this.showMarked}>Marked</div>
+                    <div className="menu-item" onClick={this.showStarred}>Starred</div>
                     <div className="menu-item" onClick={this.logout}>Logout</div>
                 </div>
             </div>;

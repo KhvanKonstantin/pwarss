@@ -36,7 +36,7 @@ export default class NewsStore {
         try {
             let requests = [api.entry.findAll(MAX_ENTRIES_PER_REQUEST),
                 api.entry.findUnread(MAX_ENTRIES_PER_REQUEST),
-                api.entry.findMarked(MAX_ENTRIES_PER_REQUEST)];
+                api.entry.findStarred(MAX_ENTRIES_PER_REQUEST)];
 
             let [latest, unread, starred] = await Promise.all(requests);
 
@@ -78,11 +78,11 @@ export default class NewsStore {
         })
     }
 
-    async toggleEntryMark(id: IdType) {
+    async starEntry(id: IdType, star: boolean) {
         try {
             const entry = this.entryById(id);
             if (entry.id != NullEntry.id) {
-                let {success, entry: updatedEntry} = await api.entry.markEntry(id, !entry.marked);
+                let {success, entry: updatedEntry} = await api.entry.starEntry(id, star);
                 if (success) {
                     this.replaceEntry(updatedEntry)
                 }
@@ -92,11 +92,11 @@ export default class NewsStore {
         }
     }
 
-    async markEntryRead(id: IdType, read: boolean) {
+    async readEntry(id: IdType, read: boolean) {
         try {
             const entry = this.entryById(id);
             if (entry.id != NullEntry.id) {
-                let {success, entry: updatedEntry} = await api.entry.markEntryRead(id, read);
+                let {success, entry: updatedEntry} = await api.entry.readEntry(id, read);
                 if (success) {
                     this.replaceEntry(updatedEntry)
                 }
@@ -106,14 +106,14 @@ export default class NewsStore {
         }
     }
 
-    async markAllRead() {
+    async readAll() {
         try {
             if (this.latest.length <= 0) {
                 return
             }
 
             let maxId = this.latest[0].id;
-            await api.entry.markAllRead(maxId);
+            await api.entry.readAll(maxId);
             await this.updateNews();
         } catch (e) {
             console.log(e)

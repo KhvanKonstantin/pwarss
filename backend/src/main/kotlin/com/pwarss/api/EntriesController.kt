@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api")
 class EntriesController(private val entriesService: EntriesServiceTtrss) {
 
-    class MarkEntryRequest(val mark: Boolean?)
-    class MarkEntryReadRequest(val read: Boolean?)
+    class StarEntryRequest(val star: Boolean?)
+    class ReadEntryRequest(val read: Boolean?)
     class ReadAllRequest(val maxId: Long?)
     class GenericResponse(val success: Boolean)
     class GenericResponseWithEntry(val success: Boolean, val entry: NewsEntry?)
@@ -44,9 +44,9 @@ class EntriesController(private val entriesService: EntriesServiceTtrss) {
         return ResponseEntity.ok(entries)
     }
 
-    @GetMapping("/marked")
-    fun findMarked(@RequestParam("limit", required = false, defaultValue = "500") limit: Int, user: User): ResponseEntity<List<NewsEntry>> {
-        val entries = entriesService.findMarked(user.id, limit)
+    @GetMapping("/starred")
+    fun findStarred(@RequestParam("limit", required = false, defaultValue = "500") limit: Int, user: User): ResponseEntity<List<NewsEntry>> {
+        val entries = entriesService.findStarred(user.id, limit)
         return ResponseEntity.ok(entries)
     }
 
@@ -58,16 +58,16 @@ class EntriesController(private val entriesService: EntriesServiceTtrss) {
     }
 
 
-    @PostMapping("/entries/{id}/mark", consumes = [MediaType.APPLICATION_JSON_UTF8_VALUE], produces = [MediaType.APPLICATION_JSON_UTF8_VALUE])
-    fun markEntry(@PathVariable("id") id: Long, @RequestBody form: MarkEntryRequest, user: User): ResponseEntity<GenericResponseWithEntry> {
-        val (success, entry) = entriesService.markEntry(user.id, id, form.mark ?: true)
+    @PostMapping("/entries/{id}/star", consumes = [MediaType.APPLICATION_JSON_UTF8_VALUE], produces = [MediaType.APPLICATION_JSON_UTF8_VALUE])
+    fun starEntry(@PathVariable("id") id: Long, @RequestBody form: StarEntryRequest, user: User): ResponseEntity<GenericResponseWithEntry> {
+        val (success, entry) = entriesService.starEntry(user.id, id, form.star ?: true)
         return ResponseEntity.ok(GenericResponseWithEntry(success, entry))
     }
 
 
     @PostMapping("/entries/{id}/read", consumes = [MediaType.APPLICATION_JSON_UTF8_VALUE], produces = [MediaType.APPLICATION_JSON_UTF8_VALUE])
-    fun markEntryRead(@PathVariable("id") id: Long, @RequestBody form: MarkEntryReadRequest, user: User): ResponseEntity<GenericResponseWithEntry> {
-        val (success, entry) = entriesService.markEntryRead(user.id, id, form.read ?: true)
+    fun readEntry(@PathVariable("id") id: Long, @RequestBody form: ReadEntryRequest, user: User): ResponseEntity<GenericResponseWithEntry> {
+        val (success, entry) = entriesService.readEntry(user.id, id, form.read ?: true)
         return ResponseEntity.ok(GenericResponseWithEntry(success, entry))
     }
 }

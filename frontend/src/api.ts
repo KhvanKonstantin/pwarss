@@ -60,11 +60,11 @@ const api = {
         findById: (id: IdType) => getJson<NewsEntry>("entries/" + id),
         findAll: (limit: number) => getJson<Array<NewsEntry>>("entries", {limit}),
         findUnread: (limit: number) => getJson<Array<NewsEntry>>("unread", {limit}),
-        findMarked: (limit: number) => getJson<Array<NewsEntry>>("marked", {limit}),
-        markAllRead: (maxId: IdType) => postJson<GenericResponse>("unread/readAll", {maxId}),
+        findStarred: (limit: number) => getJson<Array<NewsEntry>>("starred", {limit}),
+        readAll: (maxId: IdType) => postJson<GenericResponse>("unread/readAll", {maxId}),
 
-        markEntry: (id: IdType, mark: boolean) => postJson<GenericResponseWithEntry>(`entries/${id}/mark`, {mark}),
-        markEntryRead: (id: IdType, read: boolean) => postJson<GenericResponseWithEntry>(`entries/${id}/read`, {read})
+        starEntry: (id: IdType, star: boolean) => postJson<GenericResponseWithEntry>(`entries/${id}/star`, {star}),
+        readEntry: (id: IdType, read: boolean) => postJson<GenericResponseWithEntry>(`entries/${id}/read`, {read})
     }
 
 };

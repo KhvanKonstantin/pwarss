@@ -16,12 +16,12 @@
         }
     }
 
-    .notmarked {
+    .star {
         color: lightgrey;
-    }
 
-    .marked {
-        color: gold;
+        &.starred {
+            color: gold;
+        }
     }
 
     .date {

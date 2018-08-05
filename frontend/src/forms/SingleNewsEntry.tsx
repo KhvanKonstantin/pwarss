@@ -7,23 +7,23 @@ import {observer} from "mobx-react";
 
 export interface SingleNewsEntryProps {
     entry: NewsEntry
-    onMarkClicked: (id: IdType) => any
+    onStarClicked: (id: IdType, star: boolean) => any
 }
 
 @observer
 class SingleNewsEntry extends React.Component<SingleNewsEntryProps> {
     render() {
-        const {entry, onMarkClicked} = this.props;
+        const {entry, onStarClicked} = this.props;
 
-        const {id, title, marked, link, content, date} = entry;
+        const {id, title, starred, link, content, date} = entry;
 
-        const markCN = !marked ? "notmarked" : "marked";
+        const starredCN = !starred ? "" : "starred";
 
         const textContent = extractTextFromHtmlString(content);
 
         return <div className="news-entry">
             <div className="header">
-                <div className={markCN} onClick={() => onMarkClicked(id)}>★</div>
+                <div className={`star ${starredCN}`} onClick={() => onStarClicked(id, !starred)}>★</div>
                 <a rel="noopener noreferrer" target="_blank" className="title" href={link}>{title}</a>
             </div>
             <div className="date">{date}</div>

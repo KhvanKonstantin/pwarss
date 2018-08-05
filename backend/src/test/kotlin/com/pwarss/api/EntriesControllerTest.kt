@@ -42,7 +42,7 @@ class EntriesControllerTest : MockMvcAuthSupport {
         mockMvc.perform(get("/api/entries/0")).andExpect(status().isForbidden)
         mockMvc.perform(get("/api/entries")).andExpect(status().isForbidden)
         mockMvc.perform(get("/api/unread")).andExpect(status().isForbidden)
-        mockMvc.perform(get("/api/marked")).andExpect(status().isForbidden)
+        mockMvc.perform(get("/api/starred")).andExpect(status().isForbidden)
     }
 
     @Test
@@ -85,13 +85,13 @@ class EntriesControllerTest : MockMvcAuthSupport {
     }
 
     @Test
-    fun findMarked() {
+    fun findStarred() {
         val (session, user) = doLogin()
 
         val entries = listOf(EMPTY_ENTRY)
-        Mockito.doReturn(entries).`when`(entriesService).findMarked(Mockito.eq(user.id), Mockito.anyInt())
+        Mockito.doReturn(entries).`when`(entriesService).findStarred(Mockito.eq(user.id), Mockito.anyInt())
 
-        mockMvc.perform(get("/api/marked").session(session))
+        mockMvc.perform(get("/api/starred").session(session))
                 .andExpect(status().isOk)
                 .andExpect(jsonMatcher(entries))
     }
@@ -111,31 +111,31 @@ class EntriesControllerTest : MockMvcAuthSupport {
     }
 
     @Test
-    fun markEntry() {
+    fun starEntry() {
         val (session, user) = doLogin()
 
         val id = 1L
-        val mark = true
+        val star = true
 
-        Mockito.doReturn(true to EMPTY_ENTRY).`when`(entriesService).markEntry(Mockito.eq(user.id), Mockito.eq(id), Mockito.eq(mark))
+        Mockito.doReturn(true to EMPTY_ENTRY).`when`(entriesService).starEntry(Mockito.eq(user.id), Mockito.eq(id), Mockito.eq(star))
 
-        mockMvc.perform(post("/api/entries/$id/mark").session(session)
-                .jsonContent(EntriesController.MarkEntryRequest(mark)))
+        mockMvc.perform(post("/api/entries/$id/star").session(session)
+                .jsonContent(EntriesController.StarEntryRequest(star)))
                 .andExpect(status().isOk)
                 .andExpect(jsonMatcher(EntriesController.GenericResponse(true)))
     }
 
     @Test
-    fun markEntryRead() {
+    fun readEntry() {
         val (session, user) = doLogin()
 
         val id = 1L
         val read = true
 
-        Mockito.doReturn(true to EMPTY_ENTRY).`when`(entriesService).markEntryRead(Mockito.eq(user.id), Mockito.eq(id), Mockito.eq(read))
+        Mockito.doReturn(true to EMPTY_ENTRY).`when`(entriesService).readEntry(Mockito.eq(user.id), Mockito.eq(id), Mockito.eq(read))
 
         mockMvc.perform(post("/api/entries/$id/read").session(session)
-                .jsonContent(EntriesController.MarkEntryReadRequest(read)))
+                .jsonContent(EntriesController.ReadEntryRequest(read)))
                 .andExpect(status().isOk)
                 .andExpect(jsonMatcher(EntriesController.GenericResponse(true)))
     }
