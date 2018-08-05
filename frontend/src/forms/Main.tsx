@@ -6,7 +6,7 @@ import {ReactNode} from 'react';
 import NewsEntryList from "./NewsList";
 import SingleNewsEntry from "./SingleNewsEntry";
 import {inject} from "mobx-react/custom";
-import NewsStore from "../stores/NewsStore";
+import NewsStore, {NEWS_FILTER} from "../stores/NewsStore";
 import {IdType} from "../model/NewsEntry";
 import {Confirm} from "./util";
 
@@ -16,10 +16,11 @@ export interface RootProps {
 }
 
 interface RootState {
-    newsEntryId: IdType | null;
-    showLeftMenu: boolean;
-    showRightMenu: boolean;
-    showConfirmReadAll: boolean;
+    newsEntryId: IdType | null
+    newsFilter: NEWS_FILTER
+    showLeftMenu: boolean
+    showRightMenu: boolean
+    showConfirmReadAll: boolean
 }
 
 const hideAllMenus = {showLeftMenu: false, showRightMenu: false};
@@ -29,6 +30,7 @@ const hideAllConfirms = {showConfirmReadAll: false};
 export default class Main extends React.Component<RootProps, RootState> {
     state = {
         newsEntryId: null,
+        newsFilter: NEWS_FILTER.UNREAD,
         showLeftMenu: false,
         showRightMenu: false,
         showConfirmReadAll: false
@@ -53,6 +55,18 @@ export default class Main extends React.Component<RootProps, RootState> {
 
     private toggleRightMenu = () => {
         this.setState(prevState => ({...hideAllMenus, showRightMenu: !prevState.showRightMenu}));
+    };
+
+    private showUnread = () => {
+        this.setState({...hideAllMenus, newsFilter: NEWS_FILTER.UNREAD});
+    };
+
+    private showAll = () => {
+        this.setState({...hideAllMenus, newsFilter: NEWS_FILTER.ALL});
+    };
+
+    private showMarked = () => {
+        this.setState({...hideAllMenus, newsFilter: NEWS_FILTER.STARRED});
     };
 
     private showNewsEntry = (id: IdType) => {
@@ -93,7 +107,7 @@ export default class Main extends React.Component<RootProps, RootState> {
     };
 
     render() {
-        const {showLeftMenu, showRightMenu, showConfirmReadAll} = this.state;
+        const {newsFilter, showLeftMenu, showRightMenu, showConfirmReadAll} = this.state;
 
         let content: ReactNode | null = null;
         let rightMenu: ReactNode | null = null;
@@ -108,7 +122,8 @@ export default class Main extends React.Component<RootProps, RootState> {
             rightMenu = <div className="menu-item"
                              onClick={() => this.markEntryRead(newsEntryId, false)}>Mark unread</div>
         } else {
-            content = <NewsEntryList onMarkClicked={this.markEntry} onTitleClicked={this.showNewsEntry}/>;
+            content = <NewsEntryList newsFilter={newsFilter}
+                                     onMarkClicked={this.markEntry} onTitleClicked={this.showNewsEntry}/>;
             rightMenu = <div className="menu-item" onClick={this.confirmMarkAllRead}>Mark all read</div>
         }
 
@@ -127,9 +142,9 @@ export default class Main extends React.Component<RootProps, RootState> {
             : <div className="item">
                 <div onClick={this.toggleLeftMenu}>☰</div>
                 <div className={`menu ${showLeftMenu ? "active" : ""}`}>
-                    <div className="menu-item">Unread</div>
-                    <div className="menu-item">All entries</div>
-                    <div className="menu-item">Marked</div>
+                    <div className="menu-item" onClick={this.showUnread}>Unread</div>
+                    <div className="menu-item" onClick={this.showAll}>All entries</div>
+                    <div className="menu-item" onClick={this.showMarked}>Marked</div>
                     <div className="menu-item" onClick={this.logout}>Logout</div>
                 </div>
             </div>;

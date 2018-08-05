@@ -3,7 +3,7 @@
 import * as React from "react";
 import {MouseEvent} from "react";
 import {inject, observer} from "mobx-react";
-import NewsStore from "../stores/NewsStore";
+import NewsStore, {NEWS_FILTER} from "../stores/NewsStore";
 import {IdType, NewsEntry} from "../model/NewsEntry";
 
 
@@ -20,6 +20,7 @@ function newsEntry(entry: NewsEntry) {
 
 export interface NewsEntryListProps {
     newsStore?: NewsStore
+    newsFilter: NEWS_FILTER
     onMarkClicked: (id: IdType) => any
     onTitleClicked: (id: IdType) => any
 }
@@ -51,7 +52,7 @@ export default class NewsEntryList extends React.Component<NewsEntryListProps> {
 
     render() {
         const newsStore = this.props.newsStore!;
-        const latestNews = newsStore.latestNews;
+        const latestNews = newsStore.newsToShow(this.props.newsFilter);
         return <div className="news-list">
             <ul onClick={this.onClick}>
                 {latestNews.map(newsEntry)}
