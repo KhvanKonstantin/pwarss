@@ -2,7 +2,6 @@
 
 
 import * as React from 'react';
-import {ReactNode} from 'react';
 import NewsEntryList from "./NewsList";
 import SingleNewsEntry from "./SingleNewsEntry";
 import {inject} from "mobx-react";
@@ -11,9 +10,13 @@ import {IdType} from "../model/NewsEntry";
 import {Confirm, ModalSpinner, withLoading} from "./util";
 import {SmartNotification} from "./Notification";
 import {UIStateStore} from "../stores/UIStateStore";
+import {AppBar} from "./AppBar";
+import {MenuItem, SideMenu} from "./SideMenu";
+import AuthStore from "../stores/AuthStore";
 
 export interface RootProps {
     newsStore?: NewsStore
+    authStore?: AuthStore
     uiStateStore?: UIStateStore
     doLogout: () => Promise<any>
 }
@@ -31,7 +34,7 @@ const hideAllMenus = {showLeftMenu: false, showRightMenu: false};
 const hideAllConfirms = {showConfirmReadAll: false};
 
 
-@inject("newsStore", "uiStateStore")
+@inject("authStore", "newsStore", "uiStateStore")
 export default class Main extends React.Component<RootProps, RootState> {
     state = {
         newsEntryId: null,
@@ -124,70 +127,66 @@ export default class Main extends React.Component<RootProps, RootState> {
         this.setState(hideAllConfirms);
     };
 
+
     render() {
         const {newsFilter, showLeftMenu, showRightMenu, showConfirmReadAll} = this.state;
-
-        let content: ReactNode | null = null;
-        let rightMenu: ReactNode | null = null;
+        const newsStore = this.props.newsStore!;
 
         const newsEntryId: number | null = this.state.newsEntryId;
-        const showEntry = newsEntryId != null;
 
-        if (newsEntryId != null) {
-            const newsStore = this.props.newsStore!;
-            content = <SingleNewsEntry entry={newsStore.entryById(newsEntryId)}
-                                       onStarClicked={this.starEntry}/>;
-            rightMenu = <div className="menu-item"
-                             onClick={() => this.readEntry(newsEntryId, false)}>Mark unread</div>
-        } else {
-            content = <NewsEntryList newsFilter={newsFilter}
-                                     onRefreshedClicked={this.updateAllNews}
-                                     onStarClicked={this.starEntry}
-                                     onTitleClicked={this.showNewsEntry}/>;
-            rightMenu = <div className="menu-item" onClick={this.confirmReadAll}>Mark all read</div>
-        }
-
-        let confirmModal: ReactNode | null = null;
-
-        if (showConfirmReadAll) {
-            confirmModal = <Confirm content="Mark all read?"
-                                    textOk="Mark read"
-                                    textCancel="Cancel"
-                                    onOk={this.readAll}
-                                    onCancel={this.doHideAllConfirms}/>
-        }
-
+        const authStore = this.props.authStore!;
         const uiStateStore = this.props.uiStateStore!;
 
-        const topLeftButton = showEntry
-            ? <div className="item" onClick={this.back}><b>←</b></div>
-            : <div className="item">
-                <div onClick={this.toggleLeftMenu}>☰</div>
-                <div className={`menu ${showLeftMenu ? "active" : ""}`}>
-                    <div className="menu-item" onClick={this.showUnread}>Unread</div>
-                    <div className="menu-item" onClick={this.showAll}>All entries</div>
-                    <div className="menu-item" onClick={this.showStarred}>Starred</div>
-                    <div className="menu-item" onClick={this.logout}>Logout</div>
-                </div>
-            </div>;
+        const confirmModal = showConfirmReadAll
+            ? <Confirm content="Mark all read?"
+                       textOk="Mark read"
+                       textCancel="Cancel"
+                       onOk={this.readAll}
+                       onCancel={this.doHideAllConfirms}/>
+            : null;
 
         return (<div className="main-form">
-                <div className="header">
-                    {topLeftButton}
-                    <div className="item title"/>
-                    <div className="item">
-                        <div onClick={this.toggleRightMenu}>⋮</div>
-                        <div className={`menu right ${showRightMenu ? "active" : ""}`}>
-                            {rightMenu}
-                            {confirmModal}
-                        </div>
+
+                <AppBar leftMenuHandler={this.toggleLeftMenu}
+                        rightMenuHandler={this.toggleRightMenu}
+                        backMenuHandler={this.back}
+                        title="Title"
+                        showBack={newsEntryId != null}/>
+
+                <SideMenu visible={showLeftMenu} rightSide={false} hideMenu={this.doHideAllMenus}>
+                    <div className="header">
+                        <MenuItem>{authStore.currentUser!.login}</MenuItem>
                     </div>
-                </div>
-                <div className="content" onMouseDown={this.doHideAllMenus} onTouchStart={this.doHideAllMenus}>
-                    {content}
+                    <MenuItem handler={this.showUnread}>Unread</MenuItem>
+                    <MenuItem handler={this.showAll}>All entries</MenuItem>
+                    <MenuItem handler={this.showStarred}>Starred</MenuItem>
+                    <MenuItem handler={this.logout}>Logout</MenuItem>
+                </SideMenu>
+
+                <SideMenu visible={showRightMenu} rightSide={true} hideMenu={this.doHideAllMenus}>
+                    <div className="header">
+                        <MenuItem/>
+                    </div>
+                    {newsEntryId != null
+                        ? <MenuItem handler={() => this.readEntry(newsEntryId, false)}>Mark unread</MenuItem>
+                        : <MenuItem handler={this.confirmReadAll}>Mark all read</MenuItem>}
+                </SideMenu>
+
+                <div className={`content ${newsEntryId != null ? 'hidden' : ''}`}>
+                    <NewsEntryList newsFilter={newsFilter}
+                                   onRefreshedClicked={this.updateAllNews}
+                                   onStarClicked={this.starEntry}
+                                   onTitleClicked={this.showNewsEntry}/>;
                 </div>
 
+                {newsEntryId != null
+                && <div className="content">
+                    <SingleNewsEntry entry={newsStore.entryById(newsEntryId)} onStarClicked={this.starEntry}/>;
+                </div>}
+
                 <SmartNotification store={uiStateStore}/>
+
+                {confirmModal}
 
                 {this.state.loading && <ModalSpinner/>}
             </div>

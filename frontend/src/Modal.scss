@@ -1,22 +1,24 @@
 // Created by Konstantin Khvan on 8/4/18 4:22 PM
 
-.modal-root {
+.modal-glass {
     user-select: none;
 
-    .modal-glass {
-        margin: 0;
-        padding: 0;
-        position: fixed;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+    margin: 0;
+    padding: 0;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 
-        background: black;
-        opacity: 0.3;
-    }
+    background: black;
+    opacity: 0.3;
+}
+
+.modal-root {
+    user-select: none;
 
     .modal-content {
         margin: 0;
