@@ -1,0 +1,32 @@
+// Created by Konstantin Khvan on 9/22/18 8:46 AM
+
+
+.notification {
+    user-select: none;
+
+    margin: 0;
+    padding: 0;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+
+    background: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .3);
+
+    .content {
+        max-height: 50vh;
+        padding: 10px;
+    }
+
+    &.info {
+        .content {
+        }
+    }
+}

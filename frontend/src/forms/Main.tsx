@@ -5,13 +5,16 @@ import * as React from 'react';
 import {ReactNode} from 'react';
 import NewsEntryList from "./NewsList";
 import SingleNewsEntry from "./SingleNewsEntry";
-import {inject} from "mobx-react/custom";
+import {inject} from "mobx-react";
 import NewsStore, {NEWS_FILTER} from "../stores/NewsStore";
 import {IdType} from "../model/NewsEntry";
 import {Confirm, ModalSpinner, withLoading} from "./util";
+import {SmartNotification} from "./Notification";
+import {UIStateStore} from "../stores/UIStateStore";
 
 export interface RootProps {
     newsStore?: NewsStore
+    uiStateStore?: UIStateStore
     doLogout: () => Promise<any>
 }
 
@@ -28,7 +31,7 @@ const hideAllMenus = {showLeftMenu: false, showRightMenu: false};
 const hideAllConfirms = {showConfirmReadAll: false};
 
 
-@inject("newsStore")
+@inject("newsStore", "uiStateStore")
 export default class Main extends React.Component<RootProps, RootState> {
     state = {
         newsEntryId: null,
@@ -154,6 +157,8 @@ export default class Main extends React.Component<RootProps, RootState> {
                                     onCancel={this.doHideAllConfirms}/>
         }
 
+        const uiStateStore = this.props.uiStateStore!;
+
         const topLeftButton = showEntry
             ? <div className="item" onClick={this.back}><b>←</b></div>
             : <div className="item">
@@ -181,6 +186,8 @@ export default class Main extends React.Component<RootProps, RootState> {
                 <div className="content" onMouseDown={this.doHideAllMenus} onTouchStart={this.doHideAllMenus}>
                     {content}
                 </div>
+
+                <SmartNotification store={uiStateStore}/>
 
                 {this.state.loading && <ModalSpinner/>}
             </div>

@@ -8,9 +8,10 @@ import * as MobxReact from "mobx-react";
 import AuthStore from "./stores/AuthStore";
 import NewsStore from "./stores/NewsStore";
 import {rootDiv} from "./pageElements";
+import {UIStateStore} from "./stores/UIStateStore";
 // import registerServiceWorker from './registerServiceWorker';
 
-Mobx.configure({enforceActions: "strict"});
+Mobx.configure({enforceActions: "always"});
 
 MobxReact.onError(error => {
     console.log(error)
@@ -18,7 +19,8 @@ MobxReact.onError(error => {
 
 const authStore = new AuthStore();
 const newsStore = new NewsStore();
-const element = <MobxReact.Provider authStore={authStore} newsStore={newsStore}>
+const uiStateStore = new UIStateStore();
+const element = <MobxReact.Provider authStore={authStore} newsStore={newsStore} uiStateStore={uiStateStore}>
     <App/>
 </MobxReact.Provider>;
 
