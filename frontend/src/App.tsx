@@ -6,6 +6,7 @@ import AuthStore from "./stores/AuthStore";
 import Login from "./forms/Login";
 import Main from "./forms/Main";
 import Splash from "./forms/Splash";
+import {BrowserRouter, Route, Switch} from "react-router-dom";
 
 @inject("authStore")
 @observer
@@ -22,18 +23,20 @@ export default class App extends React.Component <{ authStore?: AuthStore }> {
         const userRefreshed = authStore.userRefreshed;
         const loggedIn = authStore.isLoggedIn;
 
-        let content = null;
-
         if (!userRefreshed) {
-            content = <Splash/>;
-        } else {
-            if (loggedIn) {
-                content = <Main doLogout={() => authStore.logout()}/>;
-            } else {
-                content = <Login doLogin={(login, password) => authStore.login(login, password)}/>;
-            }
+            return <Splash/>;
         }
 
-        return content;
+        if (!loggedIn) {
+            return <Login doLogin={(login, password) => authStore.login(login, password)}/>;
+        }
+
+        return <BrowserRouter>
+            <Switch>
+                <Route path="/" exact
+                       render={() => <Main doLogout={() => authStore.logout()}/>}/>
+                <Route/>
+            </Switch>
+        </BrowserRouter>;
     }
 }
