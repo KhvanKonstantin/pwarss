@@ -4,7 +4,7 @@
 import * as React from 'react';
 import NewsEntryList from "./NewsList";
 import SingleNewsEntry from "./SingleNewsEntry";
-import {inject} from "mobx-react";
+import {inject, observer} from "mobx-react";
 import NewsStore, {NEWS_FILTER} from "../stores/NewsStore";
 import {IdType} from "../model/NewsEntry";
 import {Confirm, ModalSpinner, withLoading} from "./util";
@@ -18,11 +18,9 @@ export interface RootProps {
     newsStore?: NewsStore
     authStore?: AuthStore
     uiStateStore?: UIStateStore
-    doLogout: () => Promise<any>
 }
 
 interface RootState {
-    newsEntryId: IdType | null
     newsFilter: NEWS_FILTER
     showLeftMenu: boolean
     showRightMenu: boolean
@@ -33,11 +31,10 @@ interface RootState {
 const hideAllMenus = {showLeftMenu: false, showRightMenu: false};
 const hideAllConfirms = {showConfirmReadAll: false};
 
-
 @inject("authStore", "newsStore", "uiStateStore")
+@observer
 export default class Main extends React.Component<RootProps, RootState> {
     state = {
-        newsEntryId: null,
         newsFilter: NEWS_FILTER.ALL,
         showLeftMenu: false,
         showRightMenu: false,
@@ -56,52 +53,34 @@ export default class Main extends React.Component<RootProps, RootState> {
         });
     };
 
-    private logout = () => {
-        this.props.doLogout();
-    };
+    private doHideAllMenus = () => this.setState(hideAllMenus);
+    private doHideAllConfirms = () => this.setState({...hideAllMenus, ...hideAllConfirms});
 
-    private back = () => {
-        this.setState({...hideAllMenus, newsEntryId: null})
-    };
 
-    private toggleLeftMenu = () => {
-        this.setState(prevState => ({...hideAllMenus, showLeftMenu: !prevState.showLeftMenu}));
-    };
-
-    private toggleRightMenu = () => {
-        this.setState(prevState => ({...hideAllMenus, showRightMenu: !prevState.showRightMenu}));
-    };
-
-    private showUnread = () => {
-        this.setState({...hideAllMenus, newsFilter: NEWS_FILTER.UNREAD});
-    };
-
-    private showAll = () => {
-        this.setState({...hideAllMenus, newsFilter: NEWS_FILTER.ALL});
-    };
-
-    private showStarred = () => {
-        this.setState({...hideAllMenus, newsFilter: NEWS_FILTER.STARRED});
-    };
+    private logout = () => this.props.authStore!.logout();
+    private back = () => this.props.uiStateStore!.showNewsList();
+    private showLeftMenu = () => this.setState({...hideAllMenus, showLeftMenu: true});
+    private showRightMenu = () => this.setState({...hideAllMenus, showRightMenu: true});
+    private showUnread = () => this.setState({...hideAllMenus, newsFilter: NEWS_FILTER.UNREAD});
+    private showAll = () => this.setState({...hideAllMenus, newsFilter: NEWS_FILTER.ALL});
+    private showStarred = () => this.setState({...hideAllMenus, newsFilter: NEWS_FILTER.STARRED});
 
     private showNewsEntry = (id: IdType) => {
-        const newsStore = this.props.newsStore!;
-        newsStore.readEntry(id, true);
-        this.setState({...hideAllMenus, newsEntryId: id});
+        this.props.newsStore!.readEntry(id, true);
+        this.props.uiStateStore!.showNewsEntry(id);
+        this.doHideAllMenus();
     };
 
     private readEntry = (id: IdType, read: boolean) => {
         withLoading(this, async () => {
-            const newsStore = this.props.newsStore!;
             this.doHideAllMenus();
-            await newsStore.readEntry(id, read);
+            await this.props.newsStore!.readEntry(id, read);
         });
     };
 
     private starEntry = (id: IdType, star: boolean) => {
         withLoading(this, async () => {
-            const newsStore = this.props.newsStore!;
-            await newsStore.starEntry(id, star);
+            await this.props.newsStore!.starEntry(id, star);
         });
     };
 
@@ -112,19 +91,9 @@ export default class Main extends React.Component<RootProps, RootState> {
 
     private readAll = () => {
         withLoading(this, async () => {
-            const newsStore = this.props.newsStore!;
             this.doHideAllConfirms();
-            await newsStore.readAll();
+            await this.props.newsStore!.readAll();
         });
-    };
-
-    private doHideAllMenus = () => {
-        this.setState(hideAllMenus);
-    };
-
-    private doHideAllConfirms = () => {
-        this.doHideAllMenus();
-        this.setState(hideAllConfirms);
     };
 
 
@@ -132,7 +101,7 @@ export default class Main extends React.Component<RootProps, RootState> {
         const {newsFilter, showLeftMenu, showRightMenu, showConfirmReadAll} = this.state;
         const newsStore = this.props.newsStore!;
 
-        const newsEntryId: number | null = this.state.newsEntryId;
+        const newsEntryId: IdType | null = this.props.uiStateStore!.newsEntryId;
 
         const authStore = this.props.authStore!;
         const uiStateStore = this.props.uiStateStore!;
@@ -147,8 +116,8 @@ export default class Main extends React.Component<RootProps, RootState> {
 
         return (<div className="main-form">
 
-                <AppBar leftMenuHandler={this.toggleLeftMenu}
-                        rightMenuHandler={this.toggleRightMenu}
+                <AppBar leftMenuHandler={this.showLeftMenu}
+                        rightMenuHandler={this.showRightMenu}
                         backMenuHandler={this.back}
                         title="Title"
                         showBack={newsEntryId != null}/>

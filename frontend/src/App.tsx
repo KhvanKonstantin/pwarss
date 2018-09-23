@@ -6,7 +6,6 @@ import AuthStore from "./stores/AuthStore";
 import Login from "./forms/Login";
 import Main from "./forms/Main";
 import Splash from "./forms/Splash";
-import {BrowserRouter, Route, Switch} from "react-router-dom";
 
 @inject("authStore")
 @observer
@@ -31,12 +30,6 @@ export default class App extends React.Component <{ authStore?: AuthStore }> {
             return <Login doLogin={(login, password) => authStore.login(login, password)}/>;
         }
 
-        return <BrowserRouter>
-            <Switch>
-                <Route path="/" exact
-                       render={() => <Main doLogout={() => authStore.logout()}/>}/>
-                <Route/>
-            </Switch>
-        </BrowserRouter>;
+        return <Main/>;
     }
 }
