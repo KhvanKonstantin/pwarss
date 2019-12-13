@@ -8,7 +8,7 @@ import api from "../api";
 export default class AuthStore {
 
     @observable
-    private _currentUser: User | null;
+    private _currentUser: User | null = null;
 
     get currentUser(): User | null {
         return this._currentUser;
@@ -25,7 +25,7 @@ export default class AuthStore {
         this.user = null;
     }
 
-    private _userRefreshed: boolean;
+    private _userRefreshed: boolean = false;
 
     get userRefreshed(): boolean {
         return this._userRefreshed;

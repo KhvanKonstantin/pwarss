@@ -1,5 +1,5 @@
 plugins {
-    id "com.moowork.node" version "1.2.0"
+    id("com.github.node-gradle.node") version "2.2.0"
 }
 
 //apply plugin: 'base'
@@ -8,7 +8,7 @@ version '1.0'
 buildDir = 'build'
 
 node {
-    version = '8.11.3'
+    version = '12.13.1'
     download = true
 }
 
@@ -16,10 +16,10 @@ task cleanFrontend(type: Delete) {
     delete "./build"
 }
 
-task buildFrontend(type: YarnTask) {
-    args = ["build"]
+task buildFrontend(type: NpmTask) {
+    args = ["run", "build"]
 }
 
 if (!file("${project.projectDir}/node_modules").exists()) {
-    buildFrontend.dependsOn("yarn_install")
+    buildFrontend.dependsOn("npm_install")
 }

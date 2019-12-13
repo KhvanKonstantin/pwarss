@@ -14,10 +14,10 @@ function getNewsEntryIdFromPath(): IdType | null {
 
 export class UIStateStore {
     @observable
-    currentNotification: NotificationInfo | null;
+    currentNotification: NotificationInfo | null = null;
 
     @observable
-    newsEntryId: IdType | null;
+    newsEntryId: IdType | null = null;
 
     private allNotifications: NotificationInfo[] = [];
 
@@ -60,7 +60,7 @@ export class UIStateStore {
         const timeout = info.autoHideMillis ? info.autoHideMillis : 0;
 
         if (timeout > 0) {
-            setTimeout(dispose, info.autoHideMillis)
+            setTimeout(dispose, timeout)
         }
 
         return dispose

@@ -13,9 +13,9 @@ import {UIStateStore} from "./stores/UIStateStore";
 
 Mobx.configure({enforceActions: "always"});
 
-MobxReact.onError(error => {
-    console.log(error)
-});
+// MobxReact.onError(error => {
+//     console.log(error)
+// });
 
 const authStore = new AuthStore();
 const newsStore = new NewsStore();

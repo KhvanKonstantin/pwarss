@@ -4,13 +4,13 @@
 export type IdType = string
 
 export class NewsEntry {
-    id: IdType;
-    read: boolean;
-    starred: boolean;
-    link: string;
-    title: string;
-    date: string;
-    content: string;
+    id: IdType = "";
+    read: boolean = false;
+    starred: boolean =false;
+    link: string = "";
+    title: string = "";
+    date: string = "";
+    content: string = "";
 }
 
 export const NullEntry: NewsEntry = {

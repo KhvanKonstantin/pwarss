@@ -4,7 +4,7 @@ import {User} from "./model/User";
 import {IdType, NewsEntry} from "./model/NewsEntry";
 
 export class GenericResponse {
-    success: boolean
+    success: boolean = false
 }
 
 export class GenericResponseWithEntry extends GenericResponse {
