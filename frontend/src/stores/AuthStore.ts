@@ -8,10 +8,10 @@ import api from "../api";
 export default class AuthStore {
 
     @observable
-    private _currentUser: User | null = null;
+    private _currentUser: User | null | undefined = undefined;
 
     get currentUser(): User | null {
-        return this._currentUser;
+        return this._currentUser ?? null;
     }
 
     private set user(value: User | null) {

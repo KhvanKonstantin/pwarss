@@ -2,6 +2,6 @@
 
 
 export class User {
-    id: number = -5;
+    id: number = -1;
     login: string = "";
 }
