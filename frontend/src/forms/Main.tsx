@@ -7,12 +7,38 @@ import SingleNewsEntry from "./SingleNewsEntry";
 import {inject, observer} from "mobx-react";
 import NewsStore, {NEWS_FILTER} from "../stores/NewsStore";
 import {IdType} from "../model/NewsEntry";
-import {Confirm, ModalSpinner, withLoading} from "./util";
+import {withLoading} from "./util";
+import {Confirm, ModalSpinner} from "./Modal";
 import {SmartNotification} from "./Notification";
 import {UIStateStore} from "../stores/UIStateStore";
 import {AppBar} from "./AppBar";
 import {MenuItem, SideMenu} from "./SideMenu";
 import AuthStore from "../stores/AuthStore";
+import styled from "styled-components";
+
+
+const Wrapper = styled.div`
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;    
+`;
+
+const Content = styled.div`
+    margin-top: 2em;
+    
+    overflow: auto;
+    height: calc(100vh - 2em);
+    
+    &.hidden {
+        display: none;
+    }
+`;
 
 export interface RootProps {
     newsStore?: NewsStore
@@ -114,7 +140,7 @@ export default class Main extends React.Component<RootProps, RootState> {
                        onCancel={this.doHideAllConfirms}/>
             : null;
 
-        return (<div className="main-form">
+        return (<Wrapper>
 
                 <AppBar leftMenuHandler={this.showLeftMenu}
                         rightMenuHandler={this.showRightMenu}
@@ -141,12 +167,12 @@ export default class Main extends React.Component<RootProps, RootState> {
                         : <MenuItem handler={this.confirmReadAll}>Mark all read</MenuItem>}
                 </SideMenu>
 
-                <div className={`content ${newsEntryId != null ? 'hidden' : ''}`}>
+                <Content className={newsEntryId != null ? 'hidden' : ''}>
                     <NewsEntryList newsFilter={newsFilter}
                                    onRefreshedClicked={this.updateAllNews}
                                    onStarClicked={this.starEntry}
                                    onTitleClicked={this.showNewsEntry}/>;
-                </div>
+                </Content>
 
                 {newsEntryId != null
                 && <div className="content">
@@ -158,7 +184,7 @@ export default class Main extends React.Component<RootProps, RootState> {
                 {confirmModal}
 
                 {this.state.loading && <ModalSpinner/>}
-            </div>
+            </Wrapper>
         );
     }
 }

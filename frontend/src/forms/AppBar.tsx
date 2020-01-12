@@ -1,9 +1,36 @@
 // Created by Konstantin Khvan on 9/22/18 10:01 AM
 
 import * as React from "react";
+import styled from "styled-components";
 
+const Wrapper = styled.div`
+    background: mediumpurple;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2em;
 
-export interface AppBarProps {
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+
+    user-select: none;
+
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .3);
+`;
+
+const Item = styled.div`
+    color: white;
+    padding: 10px;
+`;
+
+const Title = styled(Item)`
+    flex-grow: 1;
+`;
+
+interface AppBarProps {
     leftMenuHandler: () => any,
     rightMenuHandler: () => any,
     backMenuHandler: () => any,
@@ -11,21 +38,28 @@ export interface AppBarProps {
     showBack: boolean
 }
 
-export class AppBar extends React.Component<AppBarProps> {
-    render(): React.ReactNode {
-        return <div className="app-bar">
-            <div className="item">
-                {this.props.showBack
-                    ? <div onClick={this.props.backMenuHandler}>←</div>
-                    : <div onClick={this.props.leftMenuHandler}>☰</div>}
-            </div>
+export const AppBar: React.FC<AppBarProps> = (props) => {
+    const {
+        leftMenuHandler,
+        rightMenuHandler,
+        backMenuHandler,
+        title,
+        showBack
+    } = props;
 
-            <div className="item title">{this.props.title}</div>
+    const backOrHamburger = showBack ? <div onClick={backMenuHandler}>←</div> : <div onClick={leftMenuHandler}>☰</div>;
 
-            <div className="item">
-                <div onClick={this.props.rightMenuHandler}>⋮</div>
-            </div>
-        </div>
-    }
-}
+    return <Wrapper>
+        <Item>
+            {backOrHamburger}
+        </Item>
+
+        <Title>{title}</Title>
+
+        <Item>
+            <div onClick={rightMenuHandler}>⋮</div>
+        </Item>
+    </Wrapper>
+
+};
 

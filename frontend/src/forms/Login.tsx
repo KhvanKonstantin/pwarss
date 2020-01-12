@@ -4,6 +4,28 @@ import * as React from 'react';
 import {ChangeEvent, FormEvent} from 'react';
 import {ErrorSpan} from "./util";
 import {User} from "../model/User";
+import styled from "styled-components";
+
+const Form = styled.form`
+    display: flex;
+    flex-direction: column;
+    width: 320px;
+    min-height: 128px;
+    margin: auto;
+`;
+
+const Header = styled.h2`
+    margin: 5px;
+    text-align: center;
+`;
+
+const Input = styled.input`
+    margin: 5px;
+`;
+
+const Button = styled.button`
+    margin: 5px;
+`;
 
 interface Data {
     login: string
@@ -90,15 +112,15 @@ export default class Login extends React.Component<{ doLogin: (login: string, pa
         const {data, errors, loading} = this.state;
 
         return (
-            <form className="login-form" onSubmit={this.onSubmit}>
-                <h2>PWARSS</h2>
-                <input name="login" placeholder="login" disabled={loading}
+            <Form onSubmit={this.onSubmit}>
+                <Header>PWARSS</Header>
+                <Input name="login" placeholder="login" disabled={loading}
                        value={data.login} onChange={this.onChange} ref={this.loginInputRef}/>
-                <input type="password" name="password" placeholder="password" disabled={loading}
+                <Input type="password" name="password" placeholder="password" disabled={loading}
                        value={data.password} onChange={this.onChange}/>
-                <button disabled={loading}>Login</button>
+                <Button disabled={loading}>Login</Button>
                 <ErrorSpan text={errors.response}/>
-            </form>
+            </Form>
         );
     }
 }

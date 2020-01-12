@@ -5,6 +5,52 @@ import {IdType, NewsEntry} from "../model/NewsEntry";
 import {extractTextFromHtmlString} from "./util";
 import {inject, observer} from "mobx-react";
 import NewsStore from "../stores/NewsStore";
+import styled from "styled-components";
+
+const Wrapper = styled.div`
+    margin-top: 2em;
+    
+    overflow: auto;
+    height: calc(100vh - 2em);
+    
+    padding: 5px;
+    
+    .star {
+        user-select: none;
+        
+        color: lightgrey;
+        
+        margin: auto;
+        font-size: 1.3em;
+        
+        &.starred {
+            color: gold;
+        }
+    }
+`;
+
+const Header = styled.div`
+    display: flex;
+    
+    a {
+        padding: 5px;
+        text-indent: 30px;
+        text-align: justify;
+    
+        text-decoration: none;
+    }
+`;
+
+const Date = styled.div`
+    padding: 5px;
+`;
+
+const Content = styled.div`
+    padding: 5px;
+    text-indent: 30px;
+    text-align: justify;
+`;
+
 
 export interface SingleNewsEntryProps {
     newsStore?: NewsStore
@@ -28,14 +74,14 @@ class SingleNewsEntry extends React.Component<SingleNewsEntryProps> {
 
         const textContent = extractTextFromHtmlString(content);
 
-        return <div className="news-entry">
-            <div className="header">
+        return <Wrapper>
+            <Header>
                 <div className={`star ${starredCN}`} onClick={() => onStarClicked(id, !starred)}>★</div>
                 <a rel="noopener noreferrer" target="_blank" className="title" href={link}>{title}</a>
-            </div>
-            <div className="date">{date}</div>
-            <div className="content">{textContent}</div>
-        </div>;
+            </Header>
+            <Date>{date}</Date>
+            <Content>{textContent}</Content>
+        </Wrapper>;
     }
 }
 

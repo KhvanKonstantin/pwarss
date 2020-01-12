@@ -1,12 +1,4 @@
-@import "Modal.scss";
-@import "forms/AppBar";
-@import "forms/SideMenu";
-@import "forms/Notification";
-@import "forms/Splash.scss";
-@import "forms/Login.scss";
-@import "forms/Main.scss";
-@import "forms/NewsList.scss";
-@import "forms/SingleNewsEntry.scss";
+@import-normalize;
 
 body {
     margin: 0;

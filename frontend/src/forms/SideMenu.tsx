@@ -3,6 +3,43 @@
 import * as React from "react";
 import {sideMenusDiv} from "../pageElements";
 import * as ReactDom from "react-dom";
+import styled from "styled-components";
+
+const Content = styled.div`
+    user-select: none;
+
+    margin: 0;
+    padding: 0;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    background: white;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .3);
+
+    .header {
+        width:100%;
+        height: 32px;
+        background: mediumpurple;
+        color: white;
+    }
+`;
+
+const ContentRight = styled(Content)`
+    left: initial;
+    right: 0;
+`;
+
+
+const MenuItemWrap = styled.div`
+    padding: 5px;
+`;
+
 
 function makeSideMenuDiv(): HTMLDivElement {
     const div = document.createElement('div');
@@ -34,10 +71,9 @@ export class SideMenu extends React.Component<SideMenuProps> {
 
         return ReactDom.createPortal([
             <div key="glass" className="modal-glass" onClick={this.props.hideMenu}/>,
-            <div key="content"
-                 className={`side-menu-content ${this.props.rightSide ? 'right' : ''}`}>
-                {this.props.children}
-            </div>
+            this.props.rightSide
+                ? <ContentRight key="content">{this.props.children}</ContentRight>
+                : <Content key="content">{this.props.children}</Content>,
         ], this.el);
     }
 }
@@ -47,7 +83,7 @@ export class MenuItem extends React.Component<{ handler?: () => any }> {
         const handler = this.props.handler;
 
         return handler
-            ? <div className="menu-item" onClick={handler}>{this.props.children}</div>
-            : <div className="menu-item">{this.props.children}</div>
+            ? <MenuItemWrap onClick={handler}>{this.props.children}</MenuItemWrap>
+            : <MenuItemWrap>{this.props.children}</MenuItemWrap>
     }
 }
