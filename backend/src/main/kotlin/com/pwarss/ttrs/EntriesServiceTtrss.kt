@@ -33,16 +33,8 @@ class EntriesServiceTtrss(private val jdbcTemplate: NamedParameterJdbcTemplate, 
         return findEntriesImpl(ownerId, 1, entryId = entryId).firstOrNull()
     }
 
-    fun findEntries(ownerId: Long, limit: Int): List<NewsEntry> {
-        return findEntriesImpl(ownerId, limit)
-    }
-
-    fun findUnread(ownerId: Long, limit: Int): List<NewsEntry> {
-        return findEntriesImpl(ownerId, limit, unread = true)
-    }
-
-    fun findStarred(ownerId: Long, limit: Int): List<NewsEntry> {
-        return findEntriesImpl(ownerId, limit, marked = true)
+    fun findEntries(ownerId: Long, limit: Int, unread: Boolean? = null, marked: Boolean? = null): List<NewsEntry> {
+        return findEntriesImpl(ownerId, limit, unread = unread, marked = marked)
     }
 
     @Transactional

@@ -47,8 +47,8 @@ class EntriesServiceTest {
     @Test
     fun runAllFinds() {
         entriesService.findEntries(ownerId, 50)
-        entriesService.findStarred(ownerId, 50)
-        entriesService.findUnread(ownerId, 50)
+        entriesService.findEntries(ownerId, 50, marked = true)
+        entriesService.findEntries(ownerId, 50, unread = true)
     }
 
     @Test

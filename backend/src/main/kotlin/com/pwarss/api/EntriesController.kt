@@ -23,6 +23,23 @@ class EntriesController(private val entriesService: EntriesServiceTtrss) {
     class GenericResponse(val success: Boolean)
     class GenericResponseWithEntry(val success: Boolean, val entry: NewsEntry?)
 
+    @GetMapping("/entries")
+    fun entries(@RequestParam("limit", required = false, defaultValue = "500") limit: Int,
+                @RequestParam("unread", required = false) unread: Boolean?,
+                @RequestParam("starred", required = false) starred: Boolean?,
+                user: User): ResponseEntity<List<NewsEntry>> {
+        val entries = entriesService.findEntries(user.id, limit, unread, marked = starred)
+
+        return ResponseEntity.ok(entries)
+    }
+
+    @PostMapping("/entries/read")
+    fun readAll(@RequestBody req: ReadAllRequest, user: User): ResponseEntity<GenericResponse> {
+        val maxId = req.maxId ?: throw IllegalArgumentException()
+        val anyUpdatedRows = entriesService.readAll(user.id, maxId)
+        return ResponseEntity.ok(GenericResponse(anyUpdatedRows))
+    }
+
     @GetMapping("/entries/{id}")
     fun findById(@PathVariable("id") id: Long, user: User): ResponseEntity<NewsEntry> {
         val entry = entriesService.findEntryById(user.id, id)
@@ -31,32 +48,6 @@ class EntriesController(private val entriesService: EntriesServiceTtrss) {
             else -> ResponseEntity.ok(entry)
         }
     }
-
-    @GetMapping("/entries")
-    fun findEntries(@RequestParam("limit", required = false, defaultValue = "500") limit: Int, user: User): ResponseEntity<List<NewsEntry>> {
-        val entries = entriesService.findEntries(user.id, limit)
-        return ResponseEntity.ok(entries)
-    }
-
-    @GetMapping("/unread")
-    fun findUnread(@RequestParam("limit", required = false, defaultValue = "500") limit: Int, user: User): ResponseEntity<List<NewsEntry>> {
-        val entries = entriesService.findUnread(user.id, limit)
-        return ResponseEntity.ok(entries)
-    }
-
-    @GetMapping("/starred")
-    fun findStarred(@RequestParam("limit", required = false, defaultValue = "500") limit: Int, user: User): ResponseEntity<List<NewsEntry>> {
-        val entries = entriesService.findStarred(user.id, limit)
-        return ResponseEntity.ok(entries)
-    }
-
-    @PostMapping("/unread/readAll")
-    fun readAll(@RequestBody req: ReadAllRequest, user: User): ResponseEntity<GenericResponse> {
-        val maxId = req.maxId ?: throw IllegalArgumentException()
-        val anyUpdatedRows = entriesService.readAll(user.id, maxId)
-        return ResponseEntity.ok(GenericResponse(anyUpdatedRows))
-    }
-
 
     @PostMapping("/entries/{id}/star", consumes = [MediaType.APPLICATION_JSON_UTF8_VALUE], produces = [MediaType.APPLICATION_JSON_UTF8_VALUE])
     fun starEntry(@PathVariable("id") id: Long, @RequestBody form: StarEntryRequest, user: User): ResponseEntity<GenericResponseWithEntry> {

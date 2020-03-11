@@ -41,8 +41,8 @@ class EntriesControllerTest : MockMvcAuthSupport {
     fun checkAccessIsForbiddenWithoutLogin() {
         mockMvc.perform(get("/api/entries/0")).andExpect(status().isForbidden)
         mockMvc.perform(get("/api/entries")).andExpect(status().isForbidden)
-        mockMvc.perform(get("/api/unread")).andExpect(status().isForbidden)
-        mockMvc.perform(get("/api/starred")).andExpect(status().isForbidden)
+        mockMvc.perform(get("/api/entries").param("unread", "true")).andExpect(status().isForbidden)
+        mockMvc.perform(get("/api/entries").param("starred", "true")).andExpect(status().isForbidden)
     }
 
     @Test
@@ -65,7 +65,7 @@ class EntriesControllerTest : MockMvcAuthSupport {
         val (session, user) = doLogin()
 
         val entries = listOf(EMPTY_ENTRY)
-        Mockito.doReturn(entries).`when`(entriesService).findEntries(Mockito.eq(user.id), Mockito.anyInt())
+        Mockito.doReturn(entries).`when`(entriesService).findEntries(Mockito.eq(user.id), Mockito.anyInt(), Mockito.any(), Mockito.any())
 
         mockMvc.perform(get("/api/entries").session(session))
                 .andExpect(status().isOk)
@@ -77,9 +77,9 @@ class EntriesControllerTest : MockMvcAuthSupport {
         val (session, user) = doLogin()
 
         val entries = listOf(EMPTY_ENTRY)
-        Mockito.doReturn(entries).`when`(entriesService).findUnread(Mockito.eq(user.id), Mockito.anyInt())
+        Mockito.doReturn(entries).`when`(entriesService).findEntries(Mockito.eq(user.id), Mockito.anyInt(), Mockito.eq(true), Mockito.any())
 
-        mockMvc.perform(get("/api/unread").session(session))
+        mockMvc.perform(get("/api/entries").session(session).param("unread", "true"))
                 .andExpect(status().isOk)
                 .andExpect(jsonMatcher(entries))
     }
@@ -89,9 +89,9 @@ class EntriesControllerTest : MockMvcAuthSupport {
         val (session, user) = doLogin()
 
         val entries = listOf(EMPTY_ENTRY)
-        Mockito.doReturn(entries).`when`(entriesService).findStarred(Mockito.eq(user.id), Mockito.anyInt())
+        Mockito.doReturn(entries).`when`(entriesService).findEntries(Mockito.eq(user.id), Mockito.anyInt(), Mockito.any(), Mockito.eq(true))
 
-        mockMvc.perform(get("/api/starred").session(session))
+        mockMvc.perform(get("/api/entries").session(session).param("starred", "true"))
                 .andExpect(status().isOk)
                 .andExpect(jsonMatcher(entries))
     }
@@ -104,8 +104,8 @@ class EntriesControllerTest : MockMvcAuthSupport {
 
         Mockito.doReturn(true).`when`(entriesService).readAll(Mockito.eq(user.id), Mockito.eq(maxId))
 
-        mockMvc.perform(post("/api/unread/readAll").session(session)
-                .jsonContent(EntriesController.ReadAllRequest(maxId)))
+        mockMvc.perform(post("/api/entries/read").session(session)
+                        .jsonContent(EntriesController.ReadAllRequest(maxId)))
                 .andExpect(status().isOk)
                 .andExpect(jsonMatcher(EntriesController.GenericResponse(true)))
     }
@@ -120,7 +120,7 @@ class EntriesControllerTest : MockMvcAuthSupport {
         Mockito.doReturn(true to EMPTY_ENTRY).`when`(entriesService).starEntry(Mockito.eq(user.id), Mockito.eq(id), Mockito.eq(star))
 
         mockMvc.perform(post("/api/entries/$id/star").session(session)
-                .jsonContent(EntriesController.StarEntryRequest(star)))
+                        .jsonContent(EntriesController.StarEntryRequest(star)))
                 .andExpect(status().isOk)
                 .andExpect(jsonMatcher(EntriesController.GenericResponse(true)))
     }
@@ -135,7 +135,7 @@ class EntriesControllerTest : MockMvcAuthSupport {
         Mockito.doReturn(true to EMPTY_ENTRY).`when`(entriesService).readEntry(Mockito.eq(user.id), Mockito.eq(id), Mockito.eq(read))
 
         mockMvc.perform(post("/api/entries/$id/read").session(session)
-                .jsonContent(EntriesController.ReadEntryRequest(read)))
+                        .jsonContent(EntriesController.ReadEntryRequest(read)))
                 .andExpect(status().isOk)
                 .andExpect(jsonMatcher(EntriesController.GenericResponse(true)))
     }
