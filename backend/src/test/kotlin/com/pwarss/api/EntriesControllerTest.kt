@@ -102,7 +102,7 @@ class EntriesControllerTest : MockMvcAuthSupport {
 
         val ids = listOf(1L, 2L, 3L)
 
-        Mockito.doReturn(true).`when`(entriesService).markRead(Mockito.eq(user.id), Mockito.eq(ids))
+        Mockito.doReturn(true).`when`(entriesService).markRead(user.id, ids)
 
         mockMvc.perform(post("/api/entries/read").session(session)
                         .jsonContent(EntriesController.ReadAllRequest(ids)))
@@ -117,7 +117,7 @@ class EntriesControllerTest : MockMvcAuthSupport {
         val id = 1L
         val star = true
 
-        Mockito.doReturn(true to EMPTY_ENTRY).`when`(entriesService).starEntry(Mockito.eq(user.id), Mockito.eq(id), Mockito.eq(star))
+        Mockito.doReturn(true to EMPTY_ENTRY).`when`(entriesService).starEntry(user.id, id, star)
 
         mockMvc.perform(post("/api/entries/$id/star").session(session)
                         .jsonContent(EntriesController.StarEntryRequest(star)))
@@ -132,7 +132,7 @@ class EntriesControllerTest : MockMvcAuthSupport {
         val id = 1L
         val read = true
 
-        Mockito.doReturn(true to EMPTY_ENTRY).`when`(entriesService).readEntry(Mockito.eq(user.id), Mockito.eq(id), Mockito.eq(read))
+        Mockito.doReturn(true to EMPTY_ENTRY).`when`(entriesService).readEntry(user.id, id, read)
 
         mockMvc.perform(post("/api/entries/$id/read").session(session)
                         .jsonContent(EntriesController.ReadEntryRequest(read)))
