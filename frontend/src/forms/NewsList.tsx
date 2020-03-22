@@ -53,8 +53,11 @@ const Refresh = styled.div`
 
 const Entry = styled.div`
     display: flex;
+    align-items: center;
     padding: 2px;
+    // height: 32px;
     border-bottom: 1px solid lightgrey;
+    
     
     &:hover {
         background: lightyellow;
@@ -63,9 +66,10 @@ const Entry = styled.div`
 
 const EntryStar = styled.div`
     font-weight: bold;
-    font-size: 1.3em;
+    font-size: 25px;
     
-    margin: 0 5px 0 0;
+    margin-left: 5px;
+    margin-right: 7px;
     
     color: lightgrey;
     
@@ -75,7 +79,7 @@ const EntryStar = styled.div`
 `;
 
 const EntryHeader = styled.div`
-    .title.unread {
+    &.unread {
         font-weight: bold;
     }
 `;

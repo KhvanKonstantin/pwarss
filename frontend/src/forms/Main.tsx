@@ -171,7 +171,7 @@ export default class Main extends React.Component<RootProps, RootState> {
                     <NewsEntryList newsFilter={newsFilter}
                                    onRefreshedClicked={this.updateAllNews}
                                    onStarClicked={this.starEntry}
-                                   onTitleClicked={this.showNewsEntry}/>;
+                                   onTitleClicked={this.showNewsEntry}/>
                 </Content>
 
                 {newsEntryId != null
