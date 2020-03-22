@@ -100,12 +100,12 @@ class EntriesControllerTest : MockMvcAuthSupport {
     fun readAll() {
         val (session, user) = doLogin()
 
-        val maxId = 1L
+        val ids = listOf(1L, 2L, 3L)
 
-        Mockito.doReturn(true).`when`(entriesService).readAll(Mockito.eq(user.id), Mockito.eq(maxId))
+        Mockito.doReturn(true).`when`(entriesService).markRead(Mockito.eq(user.id), Mockito.eq(ids))
 
         mockMvc.perform(post("/api/entries/read").session(session)
-                        .jsonContent(EntriesController.ReadAllRequest(maxId)))
+                        .jsonContent(EntriesController.ReadAllRequest(ids)))
                 .andExpect(status().isOk)
                 .andExpect(jsonMatcher(EntriesController.GenericResponse(true)))
     }

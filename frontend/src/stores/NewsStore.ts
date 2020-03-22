@@ -126,8 +126,8 @@ export default class NewsStore {
                 return
             }
 
-            const maxId = this.latest[0].id;
-            await api.entry.readAll(maxId);
+            const ids = this.latest.filter(entry => !entry.read).map(entry => entry.id);
+            await api.entry.readAll(ids);
             await this.updateNews();
         } catch (e) {
             console.log(e)

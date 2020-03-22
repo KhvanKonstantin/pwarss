@@ -68,15 +68,22 @@ class EntriesServiceTtrss(private val jdbcTemplate: NamedParameterJdbcTemplate, 
         return success to entry
     }
 
-    fun readAll(ownerId: Long, maxId: Long): Boolean {
+    fun markRead(ownerId: Long, ids: List<Long>): Boolean {
         val query = """UPDATE ttrss_user_entries
                        SET unread = FALSE
                        WHERE owner_uid = :ownerId
-                         AND ref_id <= :refId"""
+                         AND ref_id IN (:ids)"""
 
-        val args = mutableMapOf("ownerId" to ownerId, "refId" to maxId)
+        var success = false
 
-        return jdbcTemplate.update(query, args) > 0
+        ids.chunked(50).forEach { idsChunk ->
+            val args = mutableMapOf("ownerId" to ownerId, "ids" to idsChunk)
+            val updated = jdbcTemplate.update(query, args) > 0
+
+            success = success && updated
+        }
+
+        return success
     }
 
     @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")

@@ -83,13 +83,23 @@ class EntriesServiceTest {
 
     @Test
     @Ignore("This is destructive test disabled by default")
-    fun readAll() {
-        val latestEntry = entriesService.findEntries(ownerId, 10).first()
+    fun readSingleEntry() {
+        val entries = entriesService.findEntries(ownerId, 10, unread = true)
+        val latestEntry = entries.first()
 
         entriesService.readEntry(ownerId, latestEntry.id, true)
         assertThat(entriesService.findEntryById(ownerId, latestEntry.id)?.read).isTrue()
+    }
 
-        entriesService.readAll(ownerId, latestEntry.id)
-        assertThat(entriesService.findEntries(ownerId, 10).all { it.read }).isTrue()
+    @Test
+    @Ignore("This is destructive test disabled by default")
+    fun readAll() {
+        val entries = entriesService.findEntries(ownerId, 10, unread = true)
+
+        entriesService.markRead(ownerId, entries.map { it.id })
+
+        val updatedEntries = entries.map { entriesService.findEntryById(ownerId, it.id)!! }
+        val allUnread = updatedEntries.all { it.read }
+        assertThat(allUnread).isTrue()
     }
 }

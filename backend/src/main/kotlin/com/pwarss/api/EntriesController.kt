@@ -19,7 +19,7 @@ class EntriesController(private val entriesService: EntriesServiceTtrss) {
 
     class StarEntryRequest(val star: Boolean?)
     class ReadEntryRequest(val read: Boolean?)
-    class ReadAllRequest(val maxId: Long?)
+    class ReadAllRequest(val ids: List<Long>)
     class GenericResponse(val success: Boolean)
     class GenericResponseWithEntry(val success: Boolean, val entry: NewsEntry?)
 
@@ -35,8 +35,7 @@ class EntriesController(private val entriesService: EntriesServiceTtrss) {
 
     @PostMapping("/entries/read")
     fun readAll(@RequestBody req: ReadAllRequest, user: User): ResponseEntity<GenericResponse> {
-        val maxId = req.maxId ?: throw IllegalArgumentException()
-        val anyUpdatedRows = entriesService.readAll(user.id, maxId)
+        val anyUpdatedRows = entriesService.markRead(user.id, req.ids)
         return ResponseEntity.ok(GenericResponse(anyUpdatedRows))
     }
 
