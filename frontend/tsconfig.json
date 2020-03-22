@@ -5,9 +5,9 @@
     "module": "esnext",
     "target": "es5",
     "lib": [
-      "es6",
       "dom.iterable",
-      "dom"
+      "dom",
+      "esnext"
     ],
     "sourceMap": true,
     "allowJs": true,

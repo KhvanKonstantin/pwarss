@@ -8,7 +8,7 @@ import AuthStore from "./stores/AuthStore";
 import NewsStore from "./stores/NewsStore";
 import {rootDiv} from "./pageElements";
 import {UIStateStore} from "./stores/UIStateStore";
-// import registerServiceWorker from './registerServiceWorker';
+// import * as serviceWorker from './serviceWorker';
 
 Mobx.configure({enforceActions: "always"});
 
@@ -25,4 +25,8 @@ const element = <MobxReact.Provider authStore={authStore} newsStore={newsStore} 
 
 ReactDOM.render(element, rootDiv);
 
-//registerServiceWorker();
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. Note this comes with some pitfalls.
+// Learn more about service workers: https://bit.ly/CRA-PWA
+// serviceWorker.unregister();
+
