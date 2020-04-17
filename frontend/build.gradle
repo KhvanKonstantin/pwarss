@@ -1,5 +1,5 @@
 plugins {
-    id("com.github.node-gradle.node") version "2.2.0"
+    id("com.github.node-gradle.node") version "2.2.2"
 }
 
 //apply plugin: 'base'
@@ -8,7 +8,7 @@ version '1.0'
 buildDir = 'build'
 
 node {
-    version = '12.13.1'
+    version = '12.16.2'
     download = true
 }
 
