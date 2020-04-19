@@ -105,6 +105,13 @@ export default class NewsStore {
             console.log(e)
         }
     }
+
+    reset() {
+        this.localStore.clear();
+        runInAction(() => {
+            this.cache.clear();
+        })
+    }
 }
 
 function loadAsJson<T>(key: string): T | null {
@@ -134,6 +141,10 @@ class LocalStore {
 
     updateNews(entries: Array<NewsEntry>) {
         this.update("cache", entries);
+    }
+
+    clear() {
+        this.update("cache", []);
     }
 }
 

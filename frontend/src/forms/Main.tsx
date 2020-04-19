@@ -83,7 +83,11 @@ export default class Main extends React.Component<RootProps, RootState> {
     private doHideAllConfirms = () => this.setState({...hideAllMenus, ...hideAllConfirms});
 
 
-    private logout = () => this.props.authStore!.logout();
+    private logout = () => {
+        this.props.newsStore?.reset();
+        this.props.authStore!.logout();
+    }
+
     private back = () => this.props.uiStateStore!.showNewsList();
     private showLeftMenu = () => this.setState({...hideAllMenus, showLeftMenu: true});
     private showRightMenu = () => this.setState({...hideAllMenus, showRightMenu: true});
