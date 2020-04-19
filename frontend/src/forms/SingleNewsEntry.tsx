@@ -8,10 +8,10 @@ import NewsStore from "../stores/NewsStore";
 import styled from "styled-components";
 
 const Wrapper = styled.div`
-    margin-top: 2em;
+    margin-top: 50px;
     
     overflow: auto;
-    height: calc(100vh - 2em);
+    height: calc(100vh - 50px);
     
     padding: 5px;
     
@@ -32,6 +32,8 @@ const Wrapper = styled.div`
 const Header = styled.div`
     display: flex;
     
+    font-size: 1.5em;
+    
     a {
         padding: 5px;
         text-indent: 30px;
@@ -46,6 +48,8 @@ const Date = styled.div`
 `;
 
 const Content = styled.div`
+    font-size: 1.2em;
+    
     padding: 5px;
     text-indent: 30px;
     text-align: justify;

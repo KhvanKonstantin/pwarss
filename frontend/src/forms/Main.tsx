@@ -30,10 +30,10 @@ const Wrapper = styled.div`
 `;
 
 const Content = styled.div`
-    margin-top: 2em;
+    margin-top: 50px;
     
     overflow: auto;
-    height: calc(100vh - 2em);
+    height: calc(100vh - 50px);
     
     &.hidden {
         display: none;

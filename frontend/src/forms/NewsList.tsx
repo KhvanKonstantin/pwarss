@@ -13,7 +13,7 @@ const Wrapper = styled.div`
         display: flex;
         justify-content: center;
 
-        margin-top: 2em;
+        margin-top: 50px;
     }
 `;
 
@@ -28,24 +28,27 @@ const NoData = styled.div`
 
 const Refresh = styled.div`        
         position: fixed;
-        right: 1em;
-        bottom: 2em;
+        right: 15px;
+        bottom: 15px;
+        
+        display: flex;
 
         div {
             background: orangered;
             color: white;
             font-weight: bold;
+            font-size: 30px;
 
             box-shadow: 0 5px 15px rgba(0, 0, 0, .3);
 
             user-select: none;
 
-            display: table-cell;
-            width: 2em;
-            height: 2em;
-            border-radius: 1em;
+            width: 50px;
+            height: 50px;
+            border-radius: 25px;
+
             text-align: center;
-            vertical-align: middle;
+            line-height: 50px;
         }
 `;
 
@@ -54,9 +57,9 @@ const Entry = styled.div`
     display: flex;
     align-items: center;
     padding: 2px;
-    // height: 32px;
+    height: 60px;
     border-bottom: 1px solid lightgrey;
-    
+    overflow: hidden;
     
     &:hover {
         background: lightyellow;
@@ -78,6 +81,13 @@ const EntryStar = styled.div`
 `;
 
 const EntryHeader = styled.div`
+    font-size: 1.2em;
+    
+    height: 60px;
+    margin-top: 5px;
+    
+    overflow: hidden;
+
     &.unread {
         font-weight: bold;
     }

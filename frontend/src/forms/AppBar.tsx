@@ -9,7 +9,7 @@ const Wrapper = styled.div`
     top: 0;
     left: 0;
     right: 0;
-    height: 2em;
+    height: 50px;
 
     overflow: hidden;
 
@@ -22,11 +22,17 @@ const Wrapper = styled.div`
 `;
 
 const Item = styled.div`
+    font-size: 1.5em;
+    
     color: white;
     padding: 10px;
 `;
 
 const Title = styled(Item)`
+    font-size: 1.5em;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    
     flex-grow: 1;
 `;
 

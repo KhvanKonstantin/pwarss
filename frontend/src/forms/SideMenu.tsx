@@ -19,12 +19,14 @@ const Content = styled.div`
     flex-direction: column;
     align-items: flex-start;
 
+    font-size: 1.2em;
+
     background: white;
     box-shadow: 0 5px 15px rgba(0, 0, 0, .3);
 
     .header {
-        width:100%;
-        height: 32px;
+        width: 100%;
+        height: 50px;
         background: mediumpurple;
         color: white;
     }

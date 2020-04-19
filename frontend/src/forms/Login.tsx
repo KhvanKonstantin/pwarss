@@ -7,6 +7,8 @@ import {User} from "../model/User";
 import styled from "styled-components";
 
 const Form = styled.form`
+    font-size: 1.5em;
+
     display: flex;
     flex-direction: column;
     width: 320px;
@@ -20,10 +22,14 @@ const Header = styled.h2`
 `;
 
 const Input = styled.input`
+    font-size: 1.5em;
+    
     margin: 5px;
 `;
 
 const Button = styled.button`
+    font-size: 1.5em;
+ 
     margin: 5px;
 `;
 
