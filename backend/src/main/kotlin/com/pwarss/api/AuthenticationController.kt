@@ -22,7 +22,7 @@ class AuthenticationController(val userService: UserServiceTtrss, val authentica
         return ResponseEntity.ok(user)
     }
 
-    @PostMapping("/login", consumes = [MediaType.APPLICATION_JSON_UTF8_VALUE], produces = [MediaType.APPLICATION_JSON_UTF8_VALUE])
+    @PostMapping("/login", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun login(@RequestBody loginRequest: LoginRequestFormData): ResponseEntity<User> {
         val uah = userService.checkPassword(loginRequest.login, loginRequest.password)
 
