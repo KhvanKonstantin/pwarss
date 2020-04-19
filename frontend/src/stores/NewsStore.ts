@@ -21,7 +21,7 @@ export default class NewsStore {
     private filter = NEWS_FILTER.ALL;
 
     entryById(id: IdType): NewsEntry {
-        return this.cache.find(e => id == e.id) || NullEntry;
+        return this.cache.find(e => id === e.id) || NullEntry;
     }
 
 
@@ -39,7 +39,7 @@ export default class NewsStore {
             if (filter === NEWS_FILTER.UNREAD) {
                 fn = api.entry.findUnread;
             }
-            if (filter == NEWS_FILTER.STARRED) {
+            if (filter === NEWS_FILTER.STARRED) {
                 fn = api.entry.findStarred;
             }
 

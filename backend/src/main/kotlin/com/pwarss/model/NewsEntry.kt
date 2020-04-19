@@ -2,12 +2,14 @@
 
 package com.pwarss.model
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import java.sql.Date
 
 /**
  * News entry dto
  */
-data class NewsEntry(val id: Long,
+data class NewsEntry(@JsonSerialize(using = ToStringSerializer::class) val id: Long,
                      val read: Boolean,
                      val starred: Boolean,
                      val link: String,

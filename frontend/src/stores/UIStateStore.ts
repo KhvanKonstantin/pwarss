@@ -9,7 +9,7 @@ import {IdType} from "../model/NewsEntry";
 function getNewsEntryIdFromPath(): IdType | null {
     const pathname = window.location.pathname;
     const match = pathname.match(new RegExp("^/?news/([0-9]+)/?$"));
-    return (match && match.length == 2) ? match[1] : null;
+    return (match && match.length === 2) ? match[1] : null;
 }
 
 export class UIStateStore {

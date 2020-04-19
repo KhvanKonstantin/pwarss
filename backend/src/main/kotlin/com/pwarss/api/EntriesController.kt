@@ -48,14 +48,14 @@ class EntriesController(private val entriesService: EntriesServiceTtrss) {
         }
     }
 
-    @PostMapping("/entries/{id}/star", consumes = [MediaType.APPLICATION_JSON_UTF8_VALUE], produces = [MediaType.APPLICATION_JSON_UTF8_VALUE])
+    @PostMapping("/entries/{id}/star", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun starEntry(@PathVariable("id") id: Long, @RequestBody form: StarEntryRequest, user: User): ResponseEntity<GenericResponseWithEntry> {
         val (success, entry) = entriesService.starEntry(user.id, id, form.star ?: true)
         return ResponseEntity.ok(GenericResponseWithEntry(success, entry))
     }
 
 
-    @PostMapping("/entries/{id}/read", consumes = [MediaType.APPLICATION_JSON_UTF8_VALUE], produces = [MediaType.APPLICATION_JSON_UTF8_VALUE])
+    @PostMapping("/entries/{id}/read", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun readEntry(@PathVariable("id") id: Long, @RequestBody form: ReadEntryRequest, user: User): ResponseEntity<GenericResponseWithEntry> {
         val (success, entry) = entriesService.readEntry(user.id, id, form.read ?: true)
         return ResponseEntity.ok(GenericResponseWithEntry(success, entry))

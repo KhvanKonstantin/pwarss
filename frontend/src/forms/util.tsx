@@ -15,7 +15,7 @@ export function ErrorSpan({text}: { text?: string }) {
 
 
 export function extractTextFromHtmlString(html: string) {
-    return (new DOMParser).parseFromString(html, "text/html").documentElement.textContent;
+    return (new DOMParser()).parseFromString(html, "text/html").documentElement.textContent;
 }
 
 

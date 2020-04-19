@@ -49,11 +49,11 @@ export default class AuthStore {
     async logout(): Promise<any> {
         try {
             await api.user.logout();
-            this.user = null;
             return "logout";
         } catch (e) {
-            this.resetUserState();
             throw e
+        } finally {
+            this.resetUserState();
         }
     }
 

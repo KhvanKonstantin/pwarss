@@ -40,7 +40,7 @@ export function Notification({info}: { info: NotificationInfo | null }) {
     }
 
     return <Wrapper>
-        {info?.kind == NotificationKind.INFO
+        {info?.kind === NotificationKind.INFO
             ? <ContentInfo>{info.content}</ContentInfo>
             : <Content>{info.content}</Content>}
     </Wrapper>

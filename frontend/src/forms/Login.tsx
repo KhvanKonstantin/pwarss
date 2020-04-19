@@ -88,7 +88,7 @@ export default class Login extends React.Component<{ doLogin: (login: string, pa
                 await this.props.doLogin(login, password);
             } catch (err) {
                 this.setState({loading: false});
-                if (err.response && err.response.status == 403) {
+                if (err.response && err.response.status === 403) {
                     this.setState({errors: {response: "Incorrect login and/or password"}});
                     return
                 }
