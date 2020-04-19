@@ -75,7 +75,7 @@ export default class Main extends React.Component<RootProps, RootState> {
     private updateAllNews = () => {
         withLoading(this, async () => {
             const newsStore = this.props.newsStore!;
-            await newsStore.updateNews();
+            await newsStore.refresh();
         });
     };
 
@@ -87,14 +87,21 @@ export default class Main extends React.Component<RootProps, RootState> {
     private back = () => this.props.uiStateStore!.showNewsList();
     private showLeftMenu = () => this.setState({...hideAllMenus, showLeftMenu: true});
     private showRightMenu = () => this.setState({...hideAllMenus, showRightMenu: true});
-    private showUnread = () => this.setState({...hideAllMenus, newsFilter: NEWS_FILTER.UNREAD});
-    private showAll = () => this.setState({...hideAllMenus, newsFilter: NEWS_FILTER.ALL});
-    private showStarred = () => this.setState({...hideAllMenus, newsFilter: NEWS_FILTER.STARRED});
+
+    private changeFilter = (filter: NEWS_FILTER) => this.setState({...hideAllMenus, newsFilter: filter}, () => {
+        withLoading(this, async () => {
+            const newsStore = this.props.newsStore!;
+            await newsStore.update(filter);
+        });
+    });
+
+    private showUnread = () => this.changeFilter(NEWS_FILTER.UNREAD);
+    private showAll = () => this.changeFilter(NEWS_FILTER.ALL);
+    private showStarred = () => this.changeFilter(NEWS_FILTER.STARRED);
 
     private showNewsEntry = (id: IdType) => {
-        this.props.newsStore!.readEntry(id, true);
+        this.readEntry(id, true);
         this.props.uiStateStore!.showNewsEntry(id);
-        this.doHideAllMenus();
     };
 
     private readEntry = (id: IdType, read: boolean) => {
@@ -124,8 +131,9 @@ export default class Main extends React.Component<RootProps, RootState> {
 
 
     render() {
-        const {newsFilter, showLeftMenu, showRightMenu, showConfirmReadAll} = this.state;
+        const {showLeftMenu, showRightMenu, showConfirmReadAll} = this.state;
         const newsStore = this.props.newsStore!;
+        const entries = newsStore.entries();
 
         const newsEntryId: IdType | null = this.props.uiStateStore!.newsEntryId;
 
@@ -168,7 +176,7 @@ export default class Main extends React.Component<RootProps, RootState> {
                 </SideMenu>
 
                 <Content className={newsEntryId != null ? 'hidden' : ''}>
-                    <NewsEntryList newsFilter={newsFilter}
+                    <NewsEntryList entries={entries}
                                    onRefreshedClicked={this.updateAllNews}
                                    onStarClicked={this.starEntry}
                                    onTitleClicked={this.showNewsEntry}/>

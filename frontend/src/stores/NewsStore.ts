@@ -3,7 +3,6 @@
 import {IObservableArray, observable, runInAction, toJS} from "mobx";
 import {IdType, NewsEntry, NullEntry} from "../model/NewsEntry";
 import api from "../api";
-import {debounce} from "../util";
 
 
 const MAX_ENTRIES_PER_REQUEST = 200;
@@ -17,88 +16,69 @@ export enum NEWS_FILTER {
 export default class NewsStore {
     private localStore = new LocalStore();
 
-    private latest: IObservableArray<NewsEntry> = observable.array(this.localStore.readNews(NEWS_FILTER.ALL));
-    private unread: IObservableArray<NewsEntry> = observable.array(this.localStore.readNews(NEWS_FILTER.UNREAD));
-    private starred: IObservableArray<NewsEntry> = observable.array(this.localStore.readNews(NEWS_FILTER.STARRED));
+    private cache: IObservableArray<NewsEntry> = observable.array(this.localStore.readNews());
 
-    newsToShow(filter: NEWS_FILTER): Array<NewsEntry> {
-        if (filter == NEWS_FILTER.ALL) {
-            return this.latest;
-        }
-        if (filter == NEWS_FILTER.UNREAD) {
-            return this.unread;
-        }
-        if (filter == NEWS_FILTER.STARRED) {
-            return this.starred;
-        }
-        return this.latest;
+    private filter = NEWS_FILTER.ALL;
+
+    entryById(id: IdType): NewsEntry {
+        return this.cache.find(e => id == e.id) || NullEntry;
     }
 
-    async updateNews(): Promise<any> {
-        const update = (array: IObservableArray<NewsEntry>) => (newData: Array<NewsEntry>) =>
-            runInAction(() => {
-                array.replace(newData);
-                this.saveCaches();
-            });
 
+    entries(): Array<NewsEntry> {
+        return this.cache;
+    }
+
+    async update(filter: NEWS_FILTER): Promise<NewsEntry[]> {
         try {
-            const requests = [api.entry.findAll(MAX_ENTRIES_PER_REQUEST).then(update(this.latest)),
-                api.entry.findUnread(MAX_ENTRIES_PER_REQUEST).then(update(this.unread)),
-                api.entry.findStarred(MAX_ENTRIES_PER_REQUEST).then(update(this.starred))];
+            let fn = api.entry.findAll;
 
-            await Promise.all(requests);
+            if (filter === NEWS_FILTER.ALL) {
+                fn = api.entry.findAll;
+            }
+            if (filter === NEWS_FILTER.UNREAD) {
+                fn = api.entry.findUnread;
+            }
+            if (filter == NEWS_FILTER.STARRED) {
+                fn = api.entry.findStarred;
+            }
+
+            const updated = await fn(MAX_ENTRIES_PER_REQUEST) || [];
+            this.filter = filter;
+            this.replaceEntries(updated);
+            this.localStore.updateNews(this.cache);
         } catch (e) {
             console.log(e)
         }
-        return "refreshed";
+
+        return Promise.resolve(this.cache);
     }
 
-    saveCaches = debounce(100, () => {
-        this.localStore.updateNews(NEWS_FILTER.ALL, this.latest);
-        this.localStore.updateNews(NEWS_FILTER.UNREAD, this.unread);
-        this.localStore.updateNews(NEWS_FILTER.STARRED, this.starred);
-    });
-
-    entryById(newsEntryId: IdType): NewsEntry {
-        const byId = function (entry: NewsEntry) {
-            return newsEntryId == entry.id
-        };
-
-        return this.latest.find(byId) || this.starred.find(byId) || this.unread.find(byId) || NullEntry;
+    async refresh(): Promise<NewsEntry[]> {
+        return this.update(this.filter);
     }
 
     replaceEntry(entry?: NewsEntry | null) {
         if (!entry) {
             return
         }
-        const id = entry.id;
 
         runInAction(() => {
-            [this.latest, this.unread, this.starred].forEach((entries) => {
-                const index = entries.findIndex(function (entry) {
-                    return id == entry.id
-                });
-
-                if (index != -1) {
-                    entries[index] = entry;
-
-                    this.saveCaches();
-                }
-            })
+            const updated = this.cache.map(e => entry.id === e.id ? entry : e);
+            this.cache.replace(updated);
         })
+    }
+
+    replaceEntries(entries: NewsEntry[]) {
+        runInAction(() => {
+            this.cache.replace(entries);
+        });
     }
 
     async starEntry(id: IdType, star: boolean) {
         try {
-            const entry = this.entryById(id);
-            if (entry.id == NullEntry.id) {
-                return;
-            }
-
-            const {success, entry: updatedEntry} = await api.entry.starEntry(id, star);
-            if (success) {
-                this.replaceEntry(updatedEntry)
-            }
+            const {entry} = await api.entry.starEntry(id, star);
+            this.replaceEntry(entry);
         } catch (e) {
             console.log(e)
         }
@@ -106,15 +86,8 @@ export default class NewsStore {
 
     async readEntry(id: IdType, read: boolean) {
         try {
-            const entry = this.entryById(id);
-            if (entry.id == NullEntry.id) {
-                return;
-            }
-
-            const {success, entry: updatedEntry} = await api.entry.readEntry(id, read);
-            if (success) {
-                this.replaceEntry(updatedEntry)
-            }
+            const {entry} = await api.entry.readEntry(id, read);
+            this.replaceEntry(entry);
         } catch (e) {
             console.log(e)
         }
@@ -122,13 +95,12 @@ export default class NewsStore {
 
     async readAll() {
         try {
-            if (this.latest.length <= 0) {
-                return
+            const ids = this.cache.filter(entry => !entry.read).map(entry => entry.id);
+            if (ids.length <= 0) {
+                return;
             }
-
-            const ids = this.latest.filter(entry => !entry.read).map(entry => entry.id);
             await api.entry.readAll(ids);
-            await this.updateNews();
+            await this.refresh();
         } catch (e) {
             console.log(e)
         }
@@ -156,30 +128,12 @@ class LocalStore {
         storeAsJson("v1/" + key, toJS(entries))
     }
 
-    readNews(filter: NEWS_FILTER): Array<NewsEntry> {
-        if (filter == NEWS_FILTER.ALL) {
-            return this.read("all");
-        }
-        if (filter == NEWS_FILTER.UNREAD) {
-            return this.read("unread");
-        }
-        if (filter == NEWS_FILTER.STARRED) {
-            return this.read("starred");
-        }
-        return [];
+    readNews(): Array<NewsEntry> {
+        return this.read("cache");
     }
 
-    updateNews(filter: NEWS_FILTER, entries: Array<NewsEntry>) {
-        if (filter == NEWS_FILTER.ALL) {
-            this.update("all", entries);
-        }
-        if (filter == NEWS_FILTER.UNREAD) {
-            this.update("unread", entries);
-        }
-        if (filter == NEWS_FILTER.STARRED) {
-            this.update("starred", entries);
-        }
+    updateNews(entries: Array<NewsEntry>) {
+        this.update("cache", entries);
     }
-
 }
 

@@ -2,8 +2,7 @@
 
 import * as React from "react";
 import {MouseEvent} from "react";
-import {inject, observer} from "mobx-react";
-import NewsStore, {NEWS_FILTER} from "../stores/NewsStore";
+import {observer} from "mobx-react";
 import {IdType, NewsEntry} from "../model/NewsEntry";
 import styled from "styled-components";
 
@@ -96,14 +95,12 @@ function newsEntry(entry: NewsEntry) {
 }
 
 export interface NewsEntryListProps {
-    newsStore?: NewsStore
-    newsFilter: NEWS_FILTER
+    entries: NewsEntry[]
     onStarClicked: (id: IdType, star: boolean) => any
     onTitleClicked: (id: IdType) => any
     onRefreshedClicked: () => any
 }
 
-@inject("newsStore")
 @observer
 export default class NewsEntryList extends React.Component<NewsEntryListProps> {
 
@@ -125,16 +122,12 @@ export default class NewsEntryList extends React.Component<NewsEntryListProps> {
 
 
     render() {
-        const newsStore = this.props.newsStore!;
-        const latestNews = newsStore
-            .newsToShow(this.props.newsFilter)
-            .map(newsEntry);
-
-        const empty = latestNews.length === 0;
+        const entries = this.props.entries.map(newsEntry);
+        const empty = entries.length === 0;
 
         return <Wrapper className={empty ? "empty" : ""}>
             <EntryList onClick={this.onClick}>
-                {empty ? <NoData>No entries</NoData> : latestNews}
+                {empty ? <NoData>No entries</NoData> : entries}
             </EntryList>
             <Refresh onClick={this.props.onRefreshedClicked}>
                 <div>↻</div>
