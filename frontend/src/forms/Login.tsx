@@ -16,9 +16,11 @@ const Form = styled.form`
     margin: auto;
 `;
 
-const Header = styled.h2`
+const Header = styled.img`
     margin: 5px;
     text-align: center;
+    
+    width: 320px;
 `;
 
 const Input = styled.input`
@@ -119,7 +121,7 @@ export default class Login extends React.Component<{ doLogin: (login: string, pa
 
         return (
             <Form onSubmit={this.onSubmit}>
-                <Header>PWARSS</Header>
+                <Header src="/static/images/logo.png"/>
                 <Input name="login" placeholder="login" disabled={loading}
                        value={data.login} onChange={this.onChange} ref={this.loginInputRef}/>
                 <Input type="password" name="password" placeholder="password" disabled={loading}
