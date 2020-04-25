@@ -31,7 +31,7 @@ repositories {
 dependencies {
     implementation('org.springframework.boot:spring-boot-starter-jdbc')
     implementation('org.springframework.boot:spring-boot-starter-web')
-    implementation('org.springframework.security:spring-security-crypto')
+    implementation('org.springframework.boot:spring-boot-starter-security')
     implementation('com.fasterxml.jackson.module:jackson-module-kotlin')
     implementation('org.jetbrains.kotlin:kotlin-stdlib-jdk8')
     implementation('org.jetbrains.kotlin:kotlin-reflect')
@@ -39,6 +39,7 @@ dependencies {
     runtimeOnly('org.postgresql:postgresql')
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
+    testImplementation('org.springframework.security:spring-security-test')
     testImplementation('io.projectreactor:reactor-test')
 
     compileOnly('org.springframework.boot:spring-boot-configuration-processor')
@@ -53,7 +54,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 task checkApplicationProperitesExist {
     doLast {
         def file = file("${project.projectDir}/config/application.properties")
-        if(!file.exists()){
+        if (!file.exists()) {
             throw new GradleException("bootRun requires properties file. See backend/config/application.template.properties for instructions")
         }
     }
@@ -62,7 +63,7 @@ task checkApplicationProperitesExist {
 task checkTestProperitesExist {
     doLast {
         def file = file("${project.projectDir}/src/test/config/test.properties")
-        if(!file.exists()){
+        if (!file.exists()) {
             throw new GradleException("testing requires test properties file. See backend/src/text/config/test.template.properties for instructions")
         }
     }

@@ -11,6 +11,17 @@ export class GenericResponseWithEntry extends GenericResponse {
     entry?: NewsEntry | null
 }
 
+function csrfCookieValue(): string {
+    return getCookieValue("XSRF-TOKEN") || "";
+}
+
+// https://stackoverflow.com/a/25490531/162194
+function getCookieValue(a: string): string | undefined {
+    const b = document.cookie.match('(^|[^;]+)\\s*' + a + '\\s*=\\s*([^;]+)');
+    return b ? b.pop() : '';
+}
+
+
 function encodeToQuery(params: { [name: string]: any }): string {
     if (params) {
         return "?" + Object.keys(params)
@@ -37,7 +48,8 @@ function postJson<T>(path: string, request: any): Promise<T> {
         credentials: "same-origin",
         method: "POST",
         headers: {
-            "content-type": "application/json"
+            "content-type": "application/json",
+            "X-XSRF-TOKEN": csrfCookieValue()
         }
     }).then((response: Response) => processJsonResponse<T>(response));
 }

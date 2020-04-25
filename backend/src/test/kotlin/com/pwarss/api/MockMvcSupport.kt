@@ -9,6 +9,7 @@ import com.pwarss.ttrs.UserWithHashedPassword
 import org.mockito.Mockito
 import org.springframework.http.MediaType
 import org.springframework.mock.web.MockHttpSession
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
@@ -20,7 +21,7 @@ interface MockMvcJsonSupport {
     fun jsonMatcher(obj: Any) = MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(obj))
 
     fun MockHttpServletRequestBuilder.jsonContent(obj: Any) = this
-            .contentType(MediaType.APPLICATION_JSON_UTF8)
+            .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(obj))
 }
 
@@ -38,6 +39,7 @@ interface MockMvcAuthSupport : MockMvcJsonSupport {
         val session = MockHttpSession()
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/login")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .session(session)
                 .jsonContent(mapOf("login" to user.login, "password" to password)))
                 .andExpect(MockMvcResultMatchers.status().isOk)

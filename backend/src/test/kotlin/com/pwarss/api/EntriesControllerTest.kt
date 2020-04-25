@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
@@ -105,7 +106,8 @@ class EntriesControllerTest : MockMvcAuthSupport {
         Mockito.doReturn(true).`when`(entriesService).markRead(user.id, ids)
 
         mockMvc.perform(post("/api/entries/read").session(session)
-                        .jsonContent(EntriesController.ReadAllRequest(ids)))
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .jsonContent(EntriesController.ReadAllRequest(ids)))
                 .andExpect(status().isOk)
                 .andExpect(jsonMatcher(EntriesController.GenericResponse(true)))
     }
@@ -120,7 +122,8 @@ class EntriesControllerTest : MockMvcAuthSupport {
         Mockito.doReturn(true to EMPTY_ENTRY).`when`(entriesService).starEntry(user.id, id, star)
 
         mockMvc.perform(post("/api/entries/$id/star").session(session)
-                        .jsonContent(EntriesController.StarEntryRequest(star)))
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .jsonContent(EntriesController.StarEntryRequest(star)))
                 .andExpect(status().isOk)
                 .andExpect(jsonMatcher(EntriesController.GenericResponse(true)))
     }
@@ -135,7 +138,8 @@ class EntriesControllerTest : MockMvcAuthSupport {
         Mockito.doReturn(true to EMPTY_ENTRY).`when`(entriesService).readEntry(user.id, id, read)
 
         mockMvc.perform(post("/api/entries/$id/read").session(session)
-                        .jsonContent(EntriesController.ReadEntryRequest(read)))
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .jsonContent(EntriesController.ReadEntryRequest(read)))
                 .andExpect(status().isOk)
                 .andExpect(jsonMatcher(EntriesController.GenericResponse(true)))
     }
