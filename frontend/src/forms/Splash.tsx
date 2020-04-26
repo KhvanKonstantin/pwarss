@@ -4,6 +4,14 @@
 import * as React from 'react';
 
 
-const Splash = () => <div>Splash</div>;
+const Splash = () =>
+    <div style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        fontSize: "110px"
+    }}>
+        <img src="/static/images/logo.png" alt="PWARSS"/>
+    </div>;
 
 export default Splash;
