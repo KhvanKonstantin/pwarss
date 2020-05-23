@@ -1,11 +1,11 @@
 // Created by Konstantin Khvan on 7/23/18 6:00 PM
 
-import * as React from "react";
+import React from 'react';
 import {IdType, NewsEntry} from "../model/NewsEntry";
 import {extractTextFromHtmlString} from "./util";
-import {inject, observer} from "mobx-react";
-import NewsStore from "../stores/NewsStore";
+import {observer} from "mobx-react";
 import styled from "styled-components";
+import {useStores} from "../hooks/stores";
 
 const Wrapper = styled.div`
     margin-top: 50px;
@@ -57,37 +57,33 @@ const Content = styled.div`
 
 
 export interface SingleNewsEntryProps {
-    newsStore?: NewsStore
     entry: NewsEntry
     onStarClicked: (id: IdType, star: boolean) => any
 }
 
-@inject("newsStore")
-@observer
-class SingleNewsEntry extends React.Component<SingleNewsEntryProps> {
-    render() {
-        const {entry: entryFromProps, onStarClicked} = this.props;
+const SingleNewsEntry: React.FC<SingleNewsEntryProps> = observer((props) => {
+    const {entry: entryFromProps, onStarClicked} = props;
 
-        // entries are replaced as array elements so observe whole array to receive updates
-        const newsStore = this.props.newsStore!;
-        const entry = newsStore.entryById(entryFromProps.id);
+    // entries are replaced as array elements so observe whole array to receive updates
+    const {newsStore} = useStores();
 
-        const {id, title, starred, link, content, date} = entry;
+    const entry = newsStore.entryById(entryFromProps.id);
 
-        const starredCN = !starred ? "" : "starred";
+    const {id, title, starred, link, content, date} = entry;
 
-        const textContent = extractTextFromHtmlString(content);
+    const starredCN = !starred ? "" : "starred";
 
-        return <Wrapper>
-            <Header>
-                <div className={`star ${starredCN}`} onClick={() => onStarClicked(id, !starred)}>★</div>
-                <a rel="noopener noreferrer" target="_blank" className="title" href={link}>{title}</a>
-            </Header>
-            <Date>{date}</Date>
-            <Content>{textContent}</Content>
-        </Wrapper>;
-    }
-}
+    const textContent = extractTextFromHtmlString(content);
+
+    return <Wrapper>
+        <Header>
+            <div className={`star ${starredCN}`} onClick={() => onStarClicked(id, !starred)}>★</div>
+            <a rel="noopener noreferrer" target="_blank" className="title" href={link}>{title}</a>
+        </Header>
+        <Date>{date}</Date>
+        <Content>{textContent}</Content>
+    </Wrapper>;
+});
 
 
 export default SingleNewsEntry;

@@ -1,20 +1,18 @@
 // Created by Konstantin Khvan on 7/16/18 3:35 PM
 
 
-import * as React from 'react';
-import NewsEntryList from "./NewsList";
+import React, {useEffect, useState} from 'react';
+import {NewsEntryList} from "./NewsList";
 import SingleNewsEntry from "./SingleNewsEntry";
-import {inject, observer} from "mobx-react";
-import NewsStore, {NEWS_FILTER} from "../stores/NewsStore";
+import {NEWS_FILTER} from "../stores/NewsStore";
 import {IdType} from "../model/NewsEntry";
-import {withLoading} from "./util";
 import {Confirm, ModalSpinner} from "./Modal";
 import {SmartNotification} from "./Notification";
-import {UIStateStore} from "../stores/UIStateStore";
 import {AppBar} from "./AppBar";
 import {MenuItem, SideMenu} from "./SideMenu";
-import AuthStore from "../stores/AuthStore";
 import styled from "styled-components";
+import {useStores} from "../hooks/stores";
+import {observer} from "mobx-react";
 
 
 const Wrapper = styled.div`
@@ -40,165 +38,133 @@ const Content = styled.div`
     }
 `;
 
-export interface RootProps {
-    newsStore?: NewsStore
-    authStore?: AuthStore
-    uiStateStore?: UIStateStore
-}
+export const Main: React.FC = observer(() => {
+    const [, setNewsFilter] = useState<NEWS_FILTER>(NEWS_FILTER.ALL);
+    const [showLeftMenu, setShowLeftMenu] = useState(false);
+    const [showRightMenu, setShowRightMenu] = useState(false);
+    const [showConfirmReadAll, setShowConfirmReadAll] = useState(false);
+    const [loading] = useState(false);
 
-interface RootState {
-    newsFilter: NEWS_FILTER
-    showLeftMenu: boolean
-    showRightMenu: boolean
-    showConfirmReadAll: boolean
-    loading: boolean
-}
+    const {authStore, newsStore, uiStateStore} = useStores();
 
-const hideAllMenus = {showLeftMenu: false, showRightMenu: false};
-const hideAllConfirms = {showConfirmReadAll: false};
+    useEffect(() => {
+        newsStore.refresh();
+    }, [newsStore]);
 
-@inject("authStore", "newsStore", "uiStateStore")
-@observer
-export default class Main extends React.Component<RootProps, RootState> {
-    state = {
-        newsFilter: NEWS_FILTER.ALL,
-        showLeftMenu: false,
-        showRightMenu: false,
-        showConfirmReadAll: false,
-        loading: false
+    const doHideAllMenus = () => {
+        setShowLeftMenu(false);
+        setShowRightMenu(false);
+        setShowConfirmReadAll(false);
     };
 
-    componentDidMount() {
-        this.updateAllNews();
+    const doHideAllConfirms = () => setShowConfirmReadAll(false);
+
+    const logout = () => {
+        newsStore.reset();
+        authStore.logout();
     }
 
-    private updateAllNews = () => {
-        withLoading(this, async () => {
-            const newsStore = this.props.newsStore!;
-            await newsStore.refresh();
-        });
+    const back = () => uiStateStore.showNewsList();
+    const _showLeftMenu = () => {
+        doHideAllMenus();
+        setShowLeftMenu(true);
     };
 
-    private doHideAllMenus = () => this.setState(hideAllMenus);
-    private doHideAllConfirms = () => this.setState({...hideAllMenus, ...hideAllConfirms});
-
-
-    private logout = () => {
-        this.props.newsStore?.reset();
-        this.props.authStore!.logout();
-    }
-
-    private back = () => this.props.uiStateStore!.showNewsList();
-    private showLeftMenu = () => this.setState({...hideAllMenus, showLeftMenu: true});
-    private showRightMenu = () => this.setState({...hideAllMenus, showRightMenu: true});
-
-    private changeFilter = (filter: NEWS_FILTER) => this.setState({...hideAllMenus, newsFilter: filter}, () => {
-        withLoading(this, async () => {
-            const newsStore = this.props.newsStore!;
-            await newsStore.update(filter);
-        });
-    });
-
-    private showUnread = () => this.changeFilter(NEWS_FILTER.UNREAD);
-    private showAll = () => this.changeFilter(NEWS_FILTER.ALL);
-    private showStarred = () => this.changeFilter(NEWS_FILTER.STARRED);
-
-    private showNewsEntry = (id: IdType) => {
-        this.readEntry(id, true);
-        this.props.uiStateStore!.showNewsEntry(id);
+    const _showRightMenu = () => {
+        doHideAllMenus();
+        setShowRightMenu(true);
     };
 
-    private readEntry = (id: IdType, read: boolean) => {
-        withLoading(this, async () => {
-            this.doHideAllMenus();
-            await this.props.newsStore!.readEntry(id, read);
-        });
+    const changeFilter = (filter: NEWS_FILTER) => {
+        doHideAllMenus();
+        setNewsFilter(filter)
+        newsStore.update(filter);
     };
 
-    private starEntry = (id: IdType, star: boolean) => {
-        withLoading(this, async () => {
-            await this.props.newsStore!.starEntry(id, star);
-        });
+    const showUnread = () => changeFilter(NEWS_FILTER.UNREAD);
+    const showAll = () => changeFilter(NEWS_FILTER.ALL);
+    const showStarred = () => changeFilter(NEWS_FILTER.STARRED);
+
+    const showNewsEntry = (id: IdType) => {
+        readEntry(id, true);
+        uiStateStore.showNewsEntry(id);
     };
 
-    private confirmReadAll = () => {
-        this.setState({showConfirmReadAll: true});
-        this.doHideAllMenus();
+    const readEntry = async (id: IdType, read: boolean) => {
+        doHideAllMenus();
+        await newsStore.readEntry(id, read);
     };
 
-    private readAll = () => {
-        withLoading(this, async () => {
-            this.doHideAllConfirms();
-            await this.props.newsStore!.readAll();
-        });
+    const starEntry = async (id: IdType, star: boolean) => {
+        await newsStore.starEntry(id, star);
     };
 
+    const confirmReadAll = () => {
+        doHideAllMenus();
+        setShowConfirmReadAll(true);
+    };
 
-    render() {
-        const {showLeftMenu, showRightMenu, showConfirmReadAll} = this.state;
-        const newsStore = this.props.newsStore!;
-        const entries = newsStore.entries();
+    const readAll = async () => {
+        doHideAllConfirms();
+        await newsStore.readAll();
+    };
 
-        const newsEntryId: IdType | null = this.props.uiStateStore!.newsEntryId;
+    const entries = newsStore.entries();
 
-        const authStore = this.props.authStore!;
-        const uiStateStore = this.props.uiStateStore!;
+    const newsEntryId: IdType | null = uiStateStore.newsEntryId;
 
-        const confirmModal = showConfirmReadAll
-            ? <Confirm content="Mark all read?"
-                       textOk="Mark read"
-                       textCancel="Cancel"
-                       onOk={this.readAll}
-                       onCancel={this.doHideAllConfirms}/>
-            : null;
+    const confirmModal = showConfirmReadAll
+        ? <Confirm content="Mark all read?"
+                   textOk="Mark read"
+                   textCancel="Cancel"
+                   onOk={readAll}
+                   onCancel={doHideAllConfirms}/>
+        : null;
 
-        return (<Wrapper>
+    return (<Wrapper>
 
-                <AppBar leftMenuHandler={this.showLeftMenu}
-                        rightMenuHandler={this.showRightMenu}
-                        backMenuHandler={this.back}
-                        title="Title"
-                        showBack={newsEntryId != null}/>
+            <AppBar leftMenuHandler={_showLeftMenu}
+                    rightMenuHandler={_showRightMenu}
+                    backMenuHandler={back}
+                    title="Title"
+                    showBack={newsEntryId != null}/>
 
-                <SideMenu visible={showLeftMenu} rightSide={false} hideMenu={this.doHideAllMenus}>
-                    <div className="header">
-                        <MenuItem>{authStore.currentUser!.login}</MenuItem>
-                    </div>
-                    <MenuItem handler={this.showUnread}>Unread</MenuItem>
-                    <MenuItem handler={this.showAll}>All entries</MenuItem>
-                    <MenuItem handler={this.showStarred}>Starred</MenuItem>
-                    <MenuItem handler={this.logout}>Logout</MenuItem>
-                </SideMenu>
+            <SideMenu visible={showLeftMenu} rightSide={false} hideMenu={doHideAllMenus}>
+                <div className="header">
+                    <MenuItem>{authStore.currentUser!.login}</MenuItem>
+                </div>
+                <MenuItem handler={showUnread}>Unread</MenuItem>
+                <MenuItem handler={showAll}>All entries</MenuItem>
+                <MenuItem handler={showStarred}>Starred</MenuItem>
+                <MenuItem handler={logout}>Logout</MenuItem>
+            </SideMenu>
 
-                <SideMenu visible={showRightMenu} rightSide={true} hideMenu={this.doHideAllMenus}>
-                    <div className="header">
-                        <MenuItem/>
-                    </div>
-                    {newsEntryId != null
-                        ? <MenuItem handler={() => this.readEntry(newsEntryId, false)}>Mark unread</MenuItem>
-                        : <MenuItem handler={this.confirmReadAll}>Mark all read</MenuItem>}
-                </SideMenu>
-
-                <Content className={newsEntryId != null ? 'hidden' : ''}>
-                    <NewsEntryList entries={entries}
-                                   onRefreshedClicked={this.updateAllNews}
-                                   onStarClicked={this.starEntry}
-                                   onTitleClicked={this.showNewsEntry}/>
-                </Content>
-
+            <SideMenu visible={showRightMenu} rightSide={true} hideMenu={doHideAllMenus}>
+                <div className="header">
+                    <MenuItem/>
+                </div>
                 {newsEntryId != null
-                && <div className="content">
-                    <SingleNewsEntry entry={newsStore.entryById(newsEntryId)} onStarClicked={this.starEntry}/>;
-                </div>}
+                    ? <MenuItem handler={() => readEntry(newsEntryId!, false)}>Mark unread</MenuItem>
+                    : <MenuItem handler={confirmReadAll}>Mark all read</MenuItem>}
+            </SideMenu>
 
-                <SmartNotification store={uiStateStore}/>
+            <Content className={newsEntryId != null ? 'hidden' : ''}>
+                <NewsEntryList entries={entries}
+                               onRefreshedClicked={newsStore.refresh}
+                               onStarClicked={starEntry}
+                               onTitleClicked={showNewsEntry}/>
+            </Content>
 
-                {confirmModal}
+            {newsEntryId != null
+            && <div className="content">
+                <SingleNewsEntry entry={newsStore.entryById(newsEntryId)} onStarClicked={starEntry}/>;
+            </div>}
 
-                {this.state.loading && <ModalSpinner/>}
-            </Wrapper>
-        );
-    }
-}
+            <SmartNotification store={uiStateStore}/>
 
+            {confirmModal}
 
+            {loading && <ModalSpinner/>}
+        </Wrapper>
+    );
+});

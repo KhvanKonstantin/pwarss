@@ -93,12 +93,12 @@ const EntryHeader = styled.div`
     }
 `;
 
-function newsEntry(entry: NewsEntry) {
+function NewsEntryBlock({entry}: { entry: NewsEntry }) {
     const {id, title, starred, read} = entry;
     const readCN = read ? "" : "unread";
     const starCN = !starred ? "" : "starred";
 
-    return <Entry key={id}>
+    return <Entry>
         <EntryStar className={starCN} data-star-id={id} data-star={starCN}>★</EntryStar>
         <EntryHeader className={readCN} data-id={id}>{title}</EntryHeader>
     </Entry>;
@@ -111,39 +111,33 @@ export interface NewsEntryListProps {
     onRefreshedClicked: () => any
 }
 
-@observer
-export default class NewsEntryList extends React.Component<NewsEntryListProps> {
 
-    private onClick = (event: MouseEvent) => {
+export const NewsEntryList: React.FC<NewsEntryListProps> = observer((props) => {
+    const onClick = (event: MouseEvent) => {
         const target = event.target as HTMLElement;
 
         const starId = target.dataset.starId;
         if (starId) {
-            this.props.onStarClicked(starId, !(target.dataset.star === "starred"));
+            props.onStarClicked(starId, !(target.dataset.star === "starred"));
             return
         }
 
         const id = target.dataset.id;
         if (id) {
-            this.props.onTitleClicked(id);
+            props.onTitleClicked(id);
             return
         }
     };
 
+    const entries = props.entries.map(e => (<NewsEntryBlock key={e.id} entry={e}/>));
+    const empty = entries.length === 0;
 
-    render() {
-        const entries = this.props.entries.map(newsEntry);
-        const empty = entries.length === 0;
-
-        return <Wrapper className={empty ? "empty" : ""}>
-            <EntryList onClick={this.onClick}>
-                {empty ? <NoData>No entries</NoData> : entries}
-            </EntryList>
-            <Refresh onClick={this.props.onRefreshedClicked}>
-                <div>↻</div>
-            </Refresh>
-        </Wrapper>
-    }
-}
-
-
+    return <Wrapper className={empty ? "empty" : ""}>
+        <EntryList onClick={onClick}>
+            {empty ? <NoData>No entries</NoData> : entries}
+        </EntryList>
+        <Refresh onClick={props.onRefreshedClicked}>
+            <div>↻</div>
+        </Refresh>
+    </Wrapper>
+});

@@ -1,6 +1,6 @@
 // Created by Konstantin Khvan on 9/22/18 12:59 PM
 
-import * as React from "react";
+import React, {useEffect, useState} from 'react';
 import {sideMenusDiv} from "../pageElements";
 import * as ReactDom from "react-dom";
 import styled from "styled-components";
@@ -55,37 +55,33 @@ export interface SideMenuProps {
     hideMenu: () => any
 }
 
-export class SideMenu extends React.Component<SideMenuProps> {
-    el = makeSideMenuDiv();
+export const SideMenu: React.FC<SideMenuProps> = (props) => {
+    const [el] = useState(() => makeSideMenuDiv());
 
-    componentDidMount() {
-        sideMenusDiv.appendChild(this.el);
-    }
-
-    componentWillUnmount() {
-        sideMenusDiv.removeChild(this.el);
-    }
-
-    render(): React.ReactNode {
-        if (!this.props.visible) {
-            return null
+    useEffect(() => {
+        sideMenusDiv.appendChild(el);
+        return () => {
+            sideMenusDiv.removeChild(el);
         }
+    }, [el]);
 
-        return ReactDom.createPortal([
-            <div key="glass" className="modal-glass" onClick={this.props.hideMenu}/>,
-            this.props.rightSide
-                ? <ContentRight key="content">{this.props.children}</ContentRight>
-                : <Content key="content">{this.props.children}</Content>,
-        ], this.el);
+    if (!props.visible) {
+        return null
     }
+
+    return ReactDom.createPortal([
+        <div key="glass" className="modal-glass" onClick={props.hideMenu}/>,
+        props.rightSide
+            ? <ContentRight key="content">{props.children}</ContentRight>
+            : <Content key="content">{props.children}</Content>,
+    ], el);
 }
 
-export class MenuItem extends React.Component<{ handler?: () => any }> {
-    render(): React.ReactNode {
-        const handler = this.props.handler;
 
-        return handler
-            ? <MenuItemWrap onClick={handler}>{this.props.children}</MenuItemWrap>
-            : <MenuItemWrap>{this.props.children}</MenuItemWrap>
-    }
+export const MenuItem: React.FC<{ handler?: () => any }> = (props) => {
+    const handler = props.handler;
+
+    return handler
+        ? <MenuItemWrap onClick={handler}>{props.children}</MenuItemWrap>
+        : <MenuItemWrap>{props.children}</MenuItemWrap>
 }

@@ -1,9 +1,10 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import App from './App';
+import {App} from './App';
 import './index.css';
 import * as Mobx from "mobx";
 import * as MobxReact from "mobx-react";
+import 'mobx-react/batchingForReactDom'
 import AuthStore from "./stores/AuthStore";
 import NewsStore from "./stores/NewsStore";
 import {rootDiv} from "./pageElements";

@@ -1,6 +1,6 @@
 // Created by Konstantin Khvan on 7/23/18 2:43 PM
 
-import {IObservableArray, observable, runInAction, toJS} from "mobx";
+import {action, IObservableArray, observable, toJS} from "mobx";
 import {IdType, NewsEntry, NullEntry} from "../model/NewsEntry";
 import api from "../api";
 
@@ -58,21 +58,22 @@ export default class NewsStore {
         return this.update(this.filter);
     }
 
+    @action
     replaceEntry(entry?: NewsEntry | null) {
         if (!entry) {
             return
         }
 
-        runInAction(() => {
-            const updated = this.cache.map(e => entry.id === e.id ? entry : e);
-            this.cache.replace(updated);
-        })
+        for (let i = 0; i < this.cache.length; i++) {
+            if (this.cache[i].id === entry.id) {
+                this.cache[i] = entry;
+            }
+        }
     }
 
+    @action
     replaceEntries(entries: NewsEntry[]) {
-        runInAction(() => {
-            this.cache.replace(entries);
-        });
+        this.cache.replace(entries);
     }
 
     async starEntry(id: IdType, star: boolean) {
@@ -106,11 +107,10 @@ export default class NewsStore {
         }
     }
 
+    @action
     reset() {
         this.localStore.clear();
-        runInAction(() => {
-            this.cache.clear();
-        })
+        this.cache.clear();
     }
 }
 

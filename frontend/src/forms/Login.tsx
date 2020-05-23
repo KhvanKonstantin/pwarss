@@ -1,7 +1,6 @@
 // Created by Konstantin Khvan on 7/11/18 2:04 PM
 
-import * as React from 'react';
-import {ChangeEvent, FormEvent} from 'react';
+import React, {ChangeEvent, FormEvent, useEffect, useState} from 'react';
 import {ErrorSpan} from "./util";
 import {User} from "../model/User";
 import styled from "styled-components";
@@ -46,90 +45,76 @@ interface Errors {
     response?: string
 }
 
-interface State {
-    data: Data
-    errors: Errors
-    loading: boolean
+function validate(data: Data) {
+    const errors: Errors = {};
+    if (!data.login) {
+        errors.login = "Invalid login";
+    }
+    if (!data.password) {
+        errors.password = "Invalid password";
+    }
+    return errors;
 }
 
-export default class Login extends React.Component<{ doLogin: (login: string, password: string) => Promise<User> }, State> {
-    state: State = {
-        data: {
-            login: "",
-            password: ""
-        },
-        loading: false,
-        errors: {}
-    };
 
-    loginInputRef = React.createRef<HTMLInputElement>();
+export const Login: React.FC<{ doLogin: (login: string, password: string) => Promise<User> }> = (props) => {
+    const [formData, setFormData] = useState<Data>({login: "", password: ""});
+    const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState<Errors>({});
+    const [loginInputRef] = useState(() => React.createRef<HTMLInputElement>());
 
-    componentDidMount(): void {
-        const current = this.loginInputRef.current;
+    useEffect(() => {
+        const current = loginInputRef.current;
         if (current) {
             current.focus();
         }
-    }
+    }, [loginInputRef]);
 
 
-    onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const onChange = (e: ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
 
-        this.setState({
-            data: {...this.state.data, [name]: value}
-        });
+        setFormData({...formData, [name]: value});
     };
 
-    onSubmit = async (e: FormEvent) => {
+    const onSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
-        if (this.state.loading) {
+        if (loading) {
             return
         }
 
-        const errors = this.validate(this.state.data);
-        this.setState({errors});
+        const errors = validate(formData);
+        setErrors(errors);
+
         if (Object.keys(errors).length === 0) {
-            this.setState({loading: true});
+            setLoading(true);
             try {
-                const {login, password} = this.state.data;
-                await this.props.doLogin(login, password);
+                const {login, password} = formData;
+                await props.doLogin(login, password);
             } catch (err) {
-                this.setState({loading: false});
+                setLoading(false);
+
                 if (err.response && err.response.status === 403) {
-                    this.setState({errors: {response: "Incorrect login and/or password"}});
+                    setErrors({response: "Incorrect login and/or password"});
+
                     return
                 }
-                this.setState({errors: {response: err.message}});
+                setErrors({response: err.message});
             }
         }
     };
 
-    validate(data: Data) {
-        const errors: Errors = {};
-        if (!data.login) {
-            errors.login = "Invalid login";
-        }
-        if (!data.password) {
-            errors.password = "Invalid password";
-        }
-        return errors;
-    };
-
-    render() {
-        const {data, errors, loading} = this.state;
-
-        return (
-            <Form onSubmit={this.onSubmit}>
-                <Header src="/static/images/logo.png"/>
-                <Input name="login" placeholder="login" disabled={loading}
-                       value={data.login} onChange={this.onChange} ref={this.loginInputRef}/>
-                <Input type="password" name="password" placeholder="password" disabled={loading}
-                       value={data.password} onChange={this.onChange}/>
-                <Button disabled={loading}>Login</Button>
-                <ErrorSpan text={errors.response}/>
-            </Form>
-        );
-    }
+    return (
+        <Form onSubmit={onSubmit}>
+            <Header src="/static/images/logo.png"/>
+            <Input name="login" placeholder="login" disabled={loading}
+                   value={formData.login} onChange={onChange} ref={loginInputRef}/>
+            <Input type="password" name="password" placeholder="password" disabled={loading}
+                   value={formData.password} onChange={onChange}/>
+            <Button disabled={loading}>Login</Button>
+            <ErrorSpan text={errors.response}/>
+        </Form>
+    );
 }
 

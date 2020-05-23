@@ -1,6 +1,6 @@
 // Created by Konstantin Khvan on 1/12/20, 10:56 AM
 
-import * as React from "react";
+import React, {useEffect, useState} from 'react';
 import {modalDiv} from "../pageElements";
 import * as ReactDom from "react-dom";
 import styled from "styled-components";
@@ -77,23 +77,20 @@ function makeModalDiv(): HTMLDivElement {
     return div;
 }
 
-export class Modal extends React.Component {
-    el = makeModalDiv();
+export const Modal: React.FC = (props) => {
+    const [el] = useState(() => makeModalDiv());
 
-    componentDidMount() {
-        modalDiv.appendChild(this.el);
-    }
+    useEffect(function () {
+        modalDiv.appendChild(el);
+        return function () {
+            modalDiv.removeChild(el)
+        }
+    }, [el]);
 
-    componentWillUnmount() {
-        modalDiv.removeChild(this.el);
-    }
-
-    render() {
-        return ReactDom.createPortal([
-            <ModalGlass key="glass"/>,
-            <ModalContent key="content">{this.props.children}</ModalContent>
-        ], this.el);
-    }
+    return ReactDom.createPortal([
+        <ModalGlass key="glass"/>,
+        <ModalContent key="content">{props.children}</ModalContent>
+    ], el);
 }
 
 export interface InfoProps {
