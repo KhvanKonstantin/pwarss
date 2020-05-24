@@ -1,7 +1,7 @@
 // Created by Konstantin Khvan on 7/11/18 2:04 PM
 
 import React, {ChangeEvent, FormEvent, useEffect, useState} from 'react';
-import {ErrorSpan} from "./util";
+import {ErrorSpan} from "../forms/util";
 import {User} from "../model/User";
 import styled from "styled-components";
 
@@ -57,7 +57,7 @@ function validate(data: Data) {
 }
 
 
-export const Login: React.FC<{ doLogin: (login: string, password: string) => Promise<User> }> = (props) => {
+export const LoginScreen: React.FC<{ doLogin: (login: string, password: string) => Promise<User> }> = (props) => {
     const [formData, setFormData] = useState<Data>({login: "", password: ""});
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState<Errors>({});

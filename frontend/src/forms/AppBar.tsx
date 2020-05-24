@@ -2,6 +2,8 @@
 
 import * as React from "react";
 import styled from "styled-components";
+import {Fragment, MutableRefObject, ReactElement, useState} from "react";
+import {SideMenu} from "./SideMenu";
 
 const Wrapper = styled.div`
     background: mediumpurple;
@@ -68,4 +70,55 @@ export const AppBar: React.FC<AppBarProps> = (props) => {
     </Wrapper>
 
 };
+
+export interface AppBarWithMenuProps {
+    title: string
+    hideMenusRef: MutableRefObject<() => void>
+    leftMenu?: ReactElement
+    rightMenu: ReactElement
+    onGoBack?: () => void
+    showBack: boolean
+}
+
+export const AppBarWithMenu: React.FC<AppBarWithMenuProps> = (props) => {
+    const [left, setLeft] = useState(false);
+    const [right, setRight] = useState(false);
+
+    const {title, hideMenusRef, leftMenu, rightMenu, onGoBack, showBack} = props;
+
+    const hideMenus = () => {
+        setLeft(false);
+        setRight(false);
+    };
+
+    hideMenusRef.current = hideMenus;
+
+    const showLeft = () => {
+        hideMenus();
+        setLeft(true);
+    };
+
+    const showRight = () => {
+        hideMenus();
+        setRight(true);
+    };
+
+    return <Fragment>
+        <AppBar leftMenuHandler={showLeft}
+                rightMenuHandler={showRight}
+                backMenuHandler={onGoBack || (() => 0)}
+                title={title}
+                showBack={showBack}/>
+
+        {leftMenu && <SideMenu visible={left} rightSide={false} hideMenu={hideMenus}>
+            {leftMenu}
+        </SideMenu>
+        }
+
+        <SideMenu visible={right} rightSide={true} hideMenu={hideMenus}>
+            {rightMenu}
+        </SideMenu>
+    </Fragment>;
+};
+
 

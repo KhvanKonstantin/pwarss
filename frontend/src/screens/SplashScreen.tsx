@@ -4,7 +4,7 @@
 import * as React from 'react';
 
 
-const Splash = () =>
+export const SplashScreen = () =>
     <div style={{
         display: "flex",
         flexDirection: "column",
@@ -13,5 +13,3 @@ const Splash = () =>
     }}>
         <img src="/static/images/logo.png" alt="PWARSS"/>
     </div>;
-
-export default Splash;
