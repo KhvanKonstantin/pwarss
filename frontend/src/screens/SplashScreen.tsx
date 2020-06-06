@@ -7,9 +7,21 @@ import * as React from 'react';
 export const SplashScreen = () =>
     <div style={{
         display: "flex",
-        flexDirection: "column",
         justifyContent: "center",
-        fontSize: "110px"
+        alignItems: "center",
+        fontSize: "12vw",
+        width: "100vw",
+        height: "100vh",
+        position: "absolute",
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        margin: 0,
+        padding: 0
     }}>
-        <img src="/static/images/logo.png" alt="PWARSS"/>
+        <img style={{
+            width: "50%"
+        }}
+             src="/static/images/logo.png" alt="PWARSS"/>
     </div>;

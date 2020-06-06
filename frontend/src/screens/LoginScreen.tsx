@@ -1,38 +1,23 @@
 // Created by Konstantin Khvan on 7/11/18 2:04 PM
 
 import React, {ChangeEvent, FormEvent, useEffect, useState} from 'react';
-import {ErrorSpan} from "../forms/util";
 import {User} from "../model/User";
-import styled from "styled-components";
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import Container from '@material-ui/core/Container';
+import {Box, Grid, makeStyles} from "@material-ui/core";
 
-const Form = styled.form`
-    font-size: 1.5em;
-
-    display: flex;
-    flex-direction: column;
-    width: 320px;
-    min-height: 128px;
-    margin: auto;
-`;
-
-const Header = styled.img`
-    margin: 5px;
-    text-align: center;
-    
-    width: 320px;
-`;
-
-const Input = styled.input`
-    font-size: 1.5em;
-    
-    margin: 5px;
-`;
-
-const Button = styled.button`
-    font-size: 1.5em;
- 
-    margin: 5px;
-`;
+const useStyles = makeStyles(theme => ({
+    header: {
+        width: '278px'
+    },
+    grid: {
+        marginTop: theme.spacing(3),
+    },
+    form: {
+        marginTop: theme.spacing(1),
+    }
+}));
 
 interface Data {
     login: string
@@ -58,10 +43,12 @@ function validate(data: Data) {
 
 
 export const LoginScreen: React.FC<{ doLogin: (login: string, password: string) => Promise<User> }> = (props) => {
-    const [formData, setFormData] = useState<Data>({login: "", password: ""});
+    const [data, setData] = useState<Data>({login: "", password: ""});
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState<Errors>({});
     const [loginInputRef] = useState(() => React.createRef<HTMLInputElement>());
+
+    const classes = useStyles();
 
     useEffect(() => {
         const current = loginInputRef.current;
@@ -74,7 +61,7 @@ export const LoginScreen: React.FC<{ doLogin: (login: string, password: string) 
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
 
-        setFormData({...formData, [name]: value});
+        setData({...data, [name]: value});
     };
 
     const onSubmit = async (e: FormEvent) => {
@@ -84,13 +71,13 @@ export const LoginScreen: React.FC<{ doLogin: (login: string, password: string) 
             return
         }
 
-        const errors = validate(formData);
+        const errors = validate(data);
         setErrors(errors);
 
         if (Object.keys(errors).length === 0) {
             setLoading(true);
             try {
-                const {login, password} = formData;
+                const {login, password} = data;
                 await props.doLogin(login, password);
             } catch (err) {
                 setLoading(false);
@@ -105,16 +92,56 @@ export const LoginScreen: React.FC<{ doLogin: (login: string, password: string) 
         }
     };
 
+    const error = !!errors.response;
+    const errorText = error ? errors.response : " ";
+
     return (
-        <Form onSubmit={onSubmit}>
-            <Header src="/static/images/logo.png"/>
-            <Input name="login" placeholder="login" disabled={loading}
-                   value={formData.login} onChange={onChange} ref={loginInputRef}/>
-            <Input type="password" name="password" placeholder="password" disabled={loading}
-                   value={formData.password} onChange={onChange}/>
-            <Button disabled={loading}>Login</Button>
-            <ErrorSpan text={errors.response}/>
-        </Form>
+        <Container maxWidth="xs">
+            <Grid container className={classes.grid} spacing={0} direction="column" justify="center"
+                  alignItems="center">
+                <Box>
+                    <img className={classes.header} alt="PWARSS" src="/static/images/logo.png"/>
+                </Box>
+                <form className={classes.form} noValidate onSubmit={onSubmit}>
+                    <TextField
+                        variant="outlined"
+                        margin="normal"
+                        required
+                        fullWidth
+                        label="Login"
+                        name="login"
+                        autoComplete="username"
+                        autoFocus
+                        disabled={loading}
+                        value={data.login}
+                        onChange={onChange}
+                    />
+                    <TextField
+                        variant="outlined"
+                        margin="normal"
+                        required
+                        fullWidth
+                        label="Password"
+                        name="password"
+                        type="password"
+                        autoComplete="current-password"
+                        disabled={loading}
+                        value={data.password}
+                        onChange={onChange}
+                        error={error}
+                        helperText={errorText}
+                    />
+                    <Button
+                        variant="text"
+                        type="submit"
+                        fullWidth
+                        color="primary"
+                        disabled={loading}>
+                        Sign In
+                    </Button>
+                </form>
+            </Grid>
+        </Container>
     );
 }
 

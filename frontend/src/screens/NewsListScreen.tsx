@@ -1,184 +1,135 @@
 // Created by Konstantin Khvan on 5/24/20, 1:15 AM
 
 import * as React from "react";
-import {Fragment, MouseEvent, useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 import {observer} from "mobx-react";
 import {IdType, NewsEntry} from "../model/NewsEntry";
-import styled from "styled-components";
 import {NEWS_FILTER} from "../stores/NewsStore";
 import {useHistory} from "react-router-dom";
 import {useStores} from "../hooks/stores";
-import {Confirm} from "../forms/Modal";
-import {MenuItem} from "../forms/SideMenu";
-import {AppBarWithMenu} from "../forms/AppBar";
-import {SmartNotification} from "../forms/Notification";
+// import {Confirm} from "../forms/Modal";
+import {AppBarWithMenu, useHideMenuRef} from "../forms/AppBar";
+import {
+    Avatar,
+    Button,
+    Container,
+    Dialog,
+    DialogActions,
+    DialogTitle,
+    Fab,
+    List,
+    ListItem,
+    ListItemText,
+    makeStyles,
+    MenuItem,
+    Typography
+} from "@material-ui/core";
+import {grey, red, yellow} from "@material-ui/core/colors";
+import Refresh from "@material-ui/icons/Refresh";
+import {StarButton} from "../forms/StarButton";
 
-const ScreenWrapper = styled.div`
-    margin: 0;
-    padding: 0;
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;    
-`;
-
-const Content = styled.div`
-    margin-top: 50px;
-    
-    overflow: auto;
-    height: calc(100vh - 50px);
-    
-    &.hidden {
-        display: none;
+const useScreenStyles = makeStyles(theme => ({
+    title: {
+        flexGrow: 1
+    },
+    fab: {
+        position: 'fixed',
+        bottom: theme.spacing(2),
+        right: theme.spacing(2),
     }
-`;
+}));
 
-const Wrapper = styled.div`
-    user-select: none;
-    
-    &.empty {
-        display: flex;
-        justify-content: center;
+const useListStyles = makeStyles(theme => ({
+    list: {
+        overflowX: "hidden",
+        overflowY: "auto",
+        height: "calc(100vh - 64px)"
+    },
+    row: {
+        display: "flex",
 
-        margin-top: 50px;
-    }
-`;
+        height: "90px",
+        margin: "0",
+        padding: "0",
+        background: "white",
+        overflow: "hidden",
+        borderBottom: "1px solid lightgrey",
+        alignItems: "flex-start",
+        cursor: "pointer"
+    },
 
-const EntryList = styled.div`
-    list-style: none;
-    margin: 0;
-    padding: 0;
-`;
+    avatar: {
+        backgroundColor: red[500],
+        margin: "10px",
+        alignSelf: "center",
+        width: theme.spacing(6),
+        height: theme.spacing(6),
+    },
 
-const NoData = styled.div`    
-`;
+    title: {
+        position: 'relative',
+        flexGrow: 1,
+        minWidth: "0",
+        margin: "5px",
 
-const Refresh = styled.div`        
-        position: fixed;
-        right: 15px;
-        bottom: 15px;
-        
-        display: flex;
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        display: "-webkit-box",
+        "-webkit-line-clamp": 2,
+        "-webkit-box-orient": "vertical",
 
-        div {
-            background: orangered;
-            color: white;
-            font-weight: bold;
-            font-size: 30px;
-
-            box-shadow: 0 5px 15px rgba(0, 0, 0, .3);
-
-            user-select: none;
-
-            width: 50px;
-            height: 50px;
-            border-radius: 25px;
-
-            text-align: center;
-            line-height: 50px;
+        "&.unread": {
+            fontWeight: "bold",
         }
-`;
+    },
 
+    star: {
+        display: "block",
+        width: "24px",
+        height: "24px",
+        margin: "10px",
+        alignSelf: "flex-end",
+        color: grey[500],
 
-const Entry = styled.div`
-    display: flex;
-    align-items: center;
-    padding: 2px;
-    height: 60px;
-    border-bottom: 1px solid lightgrey;
-    overflow: hidden;
-    
-    &:hover {
-        background: lightyellow;
+        "&.starred": {
+            color: yellow[700]
+        }
     }
-`;
-
-const EntryStar = styled.div`
-    font-weight: bold;
-    font-size: 25px;
-    
-    margin-left: 5px;
-    margin-right: 7px;
-    
-    color: lightgrey;
-    
-    &.starred {
-        color: gold;
-    }
-`;
-
-const EntryHeader = styled.div`
-    font-size: 1.2em;
-    
-    height: 60px;
-    margin-top: 5px;
-    
-    overflow: hidden;
-
-    &.unread {
-        font-weight: bold;
-    }
-`;
-
-function NewsEntryBlock({entry}: { entry: NewsEntry }) {
-    const {id, title, starred, read} = entry;
-    const readCN = read ? "" : "unread";
-    const starCN = !starred ? "" : "starred";
-
-    return <Entry>
-        <EntryStar className={starCN} data-star-id={id} data-star={starCN}>★</EntryStar>
-        <EntryHeader className={readCN} data-id={id}>{title}</EntryHeader>
-    </Entry>;
-}
+}));
 
 export interface NewsEntryListProps {
     entries: NewsEntry[]
-    onStarClicked: (id: IdType, star: boolean) => any
     onTitleClicked: (id: IdType) => any
-    onRefreshedClicked: () => any
 }
 
-
 export const NewsEntryList: React.FC<NewsEntryListProps> = observer((props) => {
-    const onClick = (event: MouseEvent) => {
-        const target = event.target as HTMLElement;
+    const classes = useListStyles();
 
-        const starId = target.dataset.starId;
-        if (starId) {
-            props.onStarClicked(starId, !(target.dataset.star === "starred"));
-            return
-        }
+    const entries = props.entries.map(entry => {
+        const {id, title, read} = entry;
+        const rowTitleClass = classes.title + (read ? "" : " unread");
 
-        const id = target.dataset.id;
-        if (id) {
-            props.onTitleClicked(id);
-            return
-        }
-    };
+        return <div key={id} className={classes.row} onClick={() => props.onTitleClicked(id)}>
+            <Avatar className={classes.avatar}>R</Avatar>
+            <Typography variant="h6" className={rowTitleClass}>{title}</Typography>
+            <StarButton entryId={id}/>
+        </div>
+    });
 
-    const entries = props.entries.map(e => (<NewsEntryBlock key={e.id} entry={e}/>));
-    const empty = entries.length === 0;
-
-    return <Wrapper className={empty ? "empty" : ""}>
-        <EntryList onClick={onClick}>
-            {empty ? <NoData>No entries</NoData> : entries}
-        </EntryList>
-        <Refresh onClick={props.onRefreshedClicked}>
-            <div>↻</div>
-        </Refresh>
-    </Wrapper>
+    return <div className={classes.list}>
+        {entries}
+    </div>
 });
 
 export const NewsListScreen: React.FC = observer(() => {
     const [showConfirmReadAll, setShowConfirmReadAll] = useState(false);
     const history = useHistory();
 
-    const {authStore, newsStore, uiStateStore} = useStores();
+    const {authStore, newsStore} = useStores();
 
-    const hideMenus = useRef<() => void>(() => 0);
+    const classes = useScreenStyles();
+
+    const hideMenus = useHideMenuRef();
 
     useEffect(() => {
         newsStore.refresh();
@@ -218,49 +169,46 @@ export const NewsListScreen: React.FC = observer(() => {
         newsStore.readAll();
     };
 
-    const confirmModal = showConfirmReadAll
-        ? <Confirm content="Mark all read?"
-                   textOk="Mark read"
-                   textCancel="Cancel"
-                   onOk={readAll}
-                   onCancel={() => setShowConfirmReadAll(false)}/>
-        : null;
+    const confirmDialog = <Dialog open={showConfirmReadAll} onClose={doHideAllMenus}>
+        <DialogTitle>Mark all read?</DialogTitle>
+        <DialogActions>
+            <Button onClick={() => setShowConfirmReadAll(false)} color="primary" autoFocus>
+                Cancel
+            </Button>
+            <Button onClick={readAll} color="primary">
+                Mark read
+            </Button>
+        </DialogActions>
+    </Dialog>
 
-    const leftMenu = <Fragment>
-        <div className="header">
-            <MenuItem>{authStore.currentUser!.login}</MenuItem>
-        </div>
-        <MenuItem handler={showUnread}>Unread</MenuItem>
-        <MenuItem handler={showAll}>All entries</MenuItem>
-        <MenuItem handler={showStarred}>Starred</MenuItem>
-        <MenuItem handler={logout}>Logout</MenuItem>
-    </Fragment>;
+    const leftMenu = <List>
+        <ListItem><ListItemText>{authStore.currentUser!.login}</ListItemText></ListItem>
+        <ListItem onClick={showUnread}><ListItemText>Unread</ListItemText></ListItem>
+        <ListItem onClick={showAll}><ListItemText>All entries</ListItemText></ListItem>
+        <ListItem onClick={showStarred}><ListItemText>Starred</ListItemText></ListItem>
+        <ListItem onClick={logout}><ListItemText>Logout</ListItemText></ListItem>
+    </List>;
 
-    const rightMenu = <Fragment>
-        <div className="header">
-            <MenuItem/>
-        </div>
-        <MenuItem handler={confirmReadAll}>Mark all read</MenuItem>
-    </Fragment>;
+    const rightMenu = [
+        <MenuItem key="mark-all-read" onClick={confirmReadAll}>Mark all read</MenuItem>
+    ];
 
-    return (<ScreenWrapper>
-
+    return (<Container disableGutters maxWidth={false}>
             <AppBarWithMenu title="Title"
                             hideMenusRef={hideMenus}
                             leftMenu={leftMenu} rightMenu={rightMenu}
                             showBack={false}/>
 
-            <Content>
-                <NewsEntryList entries={newsStore.entries()}
-                               onRefreshedClicked={newsStore.refresh}
-                               onStarClicked={newsStore.starEntry}
-                               onTitleClicked={showNewsEntry}/>
-            </Content>
+            <NewsEntryList entries={newsStore.entries()}
+                           onTitleClicked={showNewsEntry}/>
 
-            <SmartNotification store={uiStateStore}/>
+            <Fab color="secondary" size="medium" className={classes.fab} onClick={() => newsStore.refresh()}>
+                <Refresh/>
+            </Fab>
 
-            {confirmModal}
-        </ScreenWrapper>
+            {confirmDialog}
+
+        </Container>
     );
 });
 

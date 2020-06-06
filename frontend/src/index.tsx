@@ -1,7 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {App} from './App';
-import './index.css';
 import * as Mobx from "mobx";
 import * as MobxReact from "mobx-react";
 import 'mobx-react/batchingForReactDom'
@@ -9,6 +8,7 @@ import AuthStore from "./stores/AuthStore";
 import NewsStore from "./stores/NewsStore";
 import {rootDiv} from "./pageElements";
 import {UIStateStore} from "./stores/UIStateStore";
+import CssBaseline from "@material-ui/core/CssBaseline";
 // import * as serviceWorker from './serviceWorker';
 
 Mobx.configure({enforceActions: "always"});
@@ -21,6 +21,7 @@ const authStore = new AuthStore();
 const newsStore = new NewsStore();
 const uiStateStore = new UIStateStore();
 const element = <MobxReact.Provider authStore={authStore} newsStore={newsStore} uiStateStore={uiStateStore}>
+    <CssBaseline/>
     <App/>
 </MobxReact.Provider>;
 
