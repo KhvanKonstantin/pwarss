@@ -137,7 +137,9 @@ export const NewsListScreen: React.FC = observer(() => {
     const hideMenus = useHideMenuRef();
 
     useEffect(() => {
-        refresh();
+        if (newsStore.entries().length === 0) {
+            refresh();
+        }
     }, []);
 
     const doHideAllMenus = () => {
