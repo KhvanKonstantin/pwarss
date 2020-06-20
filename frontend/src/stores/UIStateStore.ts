@@ -11,6 +11,7 @@ export class UIStateStore {
 
     private allNotifications: NotificationInfo[] = [];
 
+    newsListScroll = 0;
 
     pushNotification(info: NotificationInfo): () => void {
         this.allNotifications.push(info);

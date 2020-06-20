@@ -1,9 +1,9 @@
 // Created by Konstantin Khvan on 5/24/20, 1:15 AM
 
 import * as React from "react";
-import {useEffect, useState} from "react";
+import {MutableRefObject, useEffect, useRef, useState} from "react";
 import {observer} from "mobx-react";
-import {IdType, NewsEntry} from "../model/NewsEntry";
+import {IdType} from "../model/NewsEntry";
 import {NEWS_FILTER} from "../stores/NewsStore";
 import {useHistory} from "react-router-dom";
 import {useStores} from "../hooks/stores";
@@ -28,7 +28,7 @@ import {grey, red, yellow} from "@material-ui/core/colors";
 import Refresh from "@material-ui/icons/Refresh";
 import {StarButton} from "../forms/StarButton";
 import {FullScreenProgressWithDelay} from "../forms/util";
-import {FixedSizeList, ListChildComponentProps} from "react-window";
+import {FixedSizeList, ListChildComponentProps, ListOnScrollProps} from "react-window";
 import {useHeightObserver} from "../hooks/heightObserver";
 
 const useStyles = makeStyles(theme => ({
@@ -104,16 +104,35 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export interface NewsEntryListProps {
-    entries: NewsEntry[]
     onTitleClicked: (id: IdType) => any
+    entryList: MutableRefObject<{ resetScroll: () => void } | null>
 }
 
-export const NewsEntryList: React.FC<NewsEntryListProps> = observer((props) => {
+export const NewsEntryList: React.FC<NewsEntryListProps> = observer(({onTitleClicked, entryList}) => {
     const classes = useStyles();
-    const entries = props.entries;
-    const onTitleClicked = props.onTitleClicked;
+    const {newsStore, uiStateStore} = useStores();
+    const entries = newsStore.entries();
 
     const [listRoot, height] = useHeightObserver<HTMLDivElement>();
+
+    const listRef = useRef<FixedSizeList | null>(null);
+    const scrollOffset = useRef(0);
+
+    const onScroll = (props: ListOnScrollProps) => {
+        scrollOffset.current = props.scrollOffset;
+    };
+
+    useEffect(() => {
+        if (entries.length !== 0 ) {
+            listRef.current?.scrollTo(uiStateStore.newsListScroll);
+        }
+    }, [entries, uiStateStore]);
+
+    entryList.current = {
+        resetScroll() {
+            listRef.current?.scrollTo(0);
+        }
+    };
 
     const row = (props: ListChildComponentProps) => {
         const {index, style} = props;
@@ -121,7 +140,12 @@ export const NewsEntryList: React.FC<NewsEntryListProps> = observer((props) => {
         const {id, title, read} = entries[index];
         const rowTitleClass = classes.title + (read ? "" : " unread");
 
-        return <div key={index} style={style} className={classes.row} onClick={() => onTitleClicked(id)}>
+        const onClick = () => {
+            onTitleClicked(id);
+            uiStateStore.newsListScroll = scrollOffset.current;
+        }
+
+        return <div key={index} style={style} className={classes.row} onClick={onClick}>
             <Avatar className={classes.avatar}>R</Avatar>
             <Typography variant="h6" className={rowTitleClass}>{title}</Typography>
             <StarButton entryId={id}/>
@@ -129,7 +153,8 @@ export const NewsEntryList: React.FC<NewsEntryListProps> = observer((props) => {
     };
 
     return <div className={classes.list} ref={listRoot}>
-        <FixedSizeList height={height} width="100%" itemSize={90} itemCount={entries.length}>
+        <FixedSizeList height={height} width="100%" itemSize={90} itemCount={entries.length}
+                       ref={listRef} onScroll={onScroll}>
             {row}
         </FixedSizeList>
     </div>
@@ -145,6 +170,8 @@ export const NewsListScreen: React.FC = observer(() => {
     const classes = useStyles();
 
     const hideMenus = useHideMenuRef();
+
+    const newsEntryListRef = useRef<{ resetScroll: () => void } | null>(null);
 
     useEffect(() => {
         if (newsStore.entries().length === 0) {
@@ -168,6 +195,7 @@ export const NewsListScreen: React.FC = observer(() => {
             setLoading(true);
             try {
                 await newsStore.refresh();
+                newsEntryListRef.current?.resetScroll();
             } finally {
                 setLoading(false);
             }
@@ -180,6 +208,7 @@ export const NewsListScreen: React.FC = observer(() => {
             setLoading(true);
             try {
                 await newsStore.update(filter);
+                newsEntryListRef.current?.resetScroll();
             } finally {
                 setLoading(false);
             }
@@ -238,8 +267,7 @@ export const NewsListScreen: React.FC = observer(() => {
             <LinearProgress color={"secondary"} className={classes.progress}
                             style={{visibility: loading ? "visible" : "hidden"}}/>
 
-            <NewsEntryList entries={newsStore.entries()}
-                           onTitleClicked={showNewsEntry}/>
+            <NewsEntryList onTitleClicked={showNewsEntry} entryList={newsEntryListRef}/>
 
             <Fab color="secondary" size="medium" className={classes.fab} onClick={refresh}>
                 <Refresh/>
