@@ -7,7 +7,6 @@ import {IdType, NewsEntry} from "../model/NewsEntry";
 import {NEWS_FILTER} from "../stores/NewsStore";
 import {useHistory} from "react-router-dom";
 import {useStores} from "../hooks/stores";
-// import {Confirm} from "../forms/Modal";
 import {AppBarWithMenu, useHideMenuRef} from "../forms/AppBar";
 import {
     Avatar,
@@ -29,12 +28,15 @@ import {grey, red, yellow} from "@material-ui/core/colors";
 import Refresh from "@material-ui/icons/Refresh";
 import {StarButton} from "../forms/StarButton";
 import {FullScreenProgressWithDelay} from "../forms/util";
+import {FixedSizeList, ListChildComponentProps} from "react-window";
+import {useHeightObserver} from "../hooks/heightObserver";
 
 const useStyles = makeStyles(theme => ({
     progress: {
         position: "absolute",
         left: "0",
-        right: "0"
+        right: "0",
+        zIndex: 1
     },
 
     fab: {
@@ -108,20 +110,28 @@ export interface NewsEntryListProps {
 
 export const NewsEntryList: React.FC<NewsEntryListProps> = observer((props) => {
     const classes = useStyles();
+    const entries = props.entries;
+    const onTitleClicked = props.onTitleClicked;
 
-    const entries = props.entries.map(entry => {
-        const {id, title, read} = entry;
+    const [listRoot, height] = useHeightObserver<HTMLDivElement>();
+
+    const row = (props: ListChildComponentProps) => {
+        const {index, style} = props;
+
+        const {id, title, read} = entries[index];
         const rowTitleClass = classes.title + (read ? "" : " unread");
 
-        return <div key={id} className={classes.row} onClick={() => props.onTitleClicked(id)}>
+        return <div key={index} style={style} className={classes.row} onClick={() => onTitleClicked(id)}>
             <Avatar className={classes.avatar}>R</Avatar>
             <Typography variant="h6" className={rowTitleClass}>{title}</Typography>
             <StarButton entryId={id}/>
         </div>
-    });
+    };
 
-    return <div className={classes.list}>
-        {entries}
+    return <div className={classes.list} ref={listRoot}>
+        <FixedSizeList height={height} width="100%" itemSize={90} itemCount={entries.length}>
+            {row}
+        </FixedSizeList>
     </div>
 });
 
