@@ -6,6 +6,7 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Container from '@material-ui/core/Container';
 import {Box, Grid, makeStyles} from "@material-ui/core";
+import {FullScreenProgressWithDelay} from "../forms/util";
 
 const useStyles = makeStyles(theme => ({
     header: {
@@ -141,6 +142,7 @@ export const LoginScreen: React.FC<{ doLogin: (login: string, password: string) 
                     </Button>
                 </form>
             </Grid>
+            <FullScreenProgressWithDelay loading={loading}/>
         </Container>
     );
 }

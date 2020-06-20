@@ -17,6 +17,7 @@ import {
     DialogActions,
     DialogTitle,
     Fab,
+    LinearProgress,
     List,
     ListItem,
     ListItemText,
@@ -27,24 +28,27 @@ import {
 import {grey, red, yellow} from "@material-ui/core/colors";
 import Refresh from "@material-ui/icons/Refresh";
 import {StarButton} from "../forms/StarButton";
+import {FullScreenProgressWithDelay} from "../forms/util";
 
-const useScreenStyles = makeStyles(theme => ({
-    title: {
-        flexGrow: 1
+const useStyles = makeStyles(theme => ({
+    progress: {
+        position: "absolute",
+        left: "0",
+        right: "0"
     },
+
     fab: {
         position: 'fixed',
         bottom: theme.spacing(2),
         right: theme.spacing(2),
-    }
-}));
+    },
 
-const useListStyles = makeStyles(theme => ({
     list: {
         overflowX: "hidden",
         overflowY: "auto",
         height: "calc(100vh - 64px)"
     },
+
     row: {
         display: "flex",
 
@@ -103,7 +107,7 @@ export interface NewsEntryListProps {
 }
 
 export const NewsEntryList: React.FC<NewsEntryListProps> = observer((props) => {
-    const classes = useListStyles();
+    const classes = useStyles();
 
     const entries = props.entries.map(entry => {
         const {id, title, read} = entry;
@@ -122,18 +126,19 @@ export const NewsEntryList: React.FC<NewsEntryListProps> = observer((props) => {
 });
 
 export const NewsListScreen: React.FC = observer(() => {
+    const [loading, setLoading] = useState(false);
     const [showConfirmReadAll, setShowConfirmReadAll] = useState(false);
     const history = useHistory();
 
     const {authStore, newsStore} = useStores();
 
-    const classes = useScreenStyles();
+    const classes = useStyles();
 
     const hideMenus = useHideMenuRef();
 
     useEffect(() => {
-        newsStore.refresh();
-    }, [newsStore]);
+        refresh();
+    }, []);
 
     const doHideAllMenus = () => {
         hideMenus?.current();
@@ -145,9 +150,28 @@ export const NewsListScreen: React.FC = observer(() => {
         authStore.logout();
     }
 
+    const refresh = () => {
+        doHideAllMenus();
+        (async () => {
+            setLoading(true);
+            try {
+                await newsStore.refresh();
+            } finally {
+                setLoading(false);
+            }
+        })();
+    };
+
     const changeFilter = (filter: NEWS_FILTER) => {
         doHideAllMenus();
-        newsStore.update(filter);
+        (async () => {
+            setLoading(true);
+            try {
+                await newsStore.update(filter);
+            } finally {
+                setLoading(false);
+            }
+        })();
     };
 
     const showUnread = () => changeFilter(NEWS_FILTER.UNREAD);
@@ -199,12 +223,17 @@ export const NewsListScreen: React.FC = observer(() => {
                             leftMenu={leftMenu} rightMenu={rightMenu}
                             showBack={false}/>
 
+            <LinearProgress color={"secondary"} className={classes.progress}
+                            style={{visibility: loading ? "visible" : "hidden"}}/>
+
             <NewsEntryList entries={newsStore.entries()}
                            onTitleClicked={showNewsEntry}/>
 
-            <Fab color="secondary" size="medium" className={classes.fab} onClick={() => newsStore.refresh()}>
+            <Fab color="secondary" size="medium" className={classes.fab} onClick={refresh}>
                 <Refresh/>
             </Fab>
+
+            <FullScreenProgressWithDelay loading={loading}/>
 
             {confirmDialog}
 
