@@ -7,8 +7,9 @@ import {observer} from "mobx-react";
 import {useStores} from "../hooks/stores";
 import {useHistory, useParams} from "react-router-dom";
 import {AppBarWithMenu, useHideMenuRef} from "../forms/AppBar";
-import {Card, CardContent, CardHeader, Container, Link as MaterialLink, MenuItem, Typography} from "@material-ui/core";
+import {Card, CardContent, CardHeader, Link as MaterialLink, MenuItem, Typography} from "@material-ui/core";
 import {StarButton} from "../forms/StarButton";
+import {AnimatedPage} from "../forms/AnimatedPage";
 
 
 interface NewsEntryContentProps {
@@ -56,6 +57,10 @@ export const NewsEntryScreen: React.FC = observer(() => {
     const {newsStore} = useStores();
 
     useEffect(() => {
+        document.title = "Title";
+    }, []);
+
+    useEffect(() => {
         if (id) {
             newsStore.readEntry(id, true);
         }
@@ -75,7 +80,7 @@ export const NewsEntryScreen: React.FC = observer(() => {
         }
     };
 
-    return (<Container disableGutters maxWidth={false}>
+    return (<AnimatedPage slide={true}>
             <AppBarWithMenu title="Title"
                             hideMenusRef={hideMenusRef}
                             rightMenu={[<MenuItem key="mark-all-read" onClick={unreadEntry}>Mark unread</MenuItem>]}
@@ -84,6 +89,6 @@ export const NewsEntryScreen: React.FC = observer(() => {
 
             <NewsEntryContent entryId={id}/>
 
-        </Container>
+        </AnimatedPage>
     );
 });

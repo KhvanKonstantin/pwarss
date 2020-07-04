@@ -6,9 +6,21 @@ import AuthStore from "./stores/AuthStore";
 import {LoginScreen} from "./screens/LoginScreen";
 import {SplashScreen} from "./screens/SplashScreen";
 import {useStores} from "./hooks/stores";
-import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
+import {BrowserRouter as Router, Route, Switch, useLocation} from "react-router-dom";
 import {NewsEntryScreen} from "./screens/NewsEntryScreen";
 import {NewsListScreen} from "./screens/NewsListScreen";
+import {AnimatePresence} from "framer-motion";
+
+const AnimatedSwitch: React.FC = ({children}) => {
+    const location = useLocation();
+
+    return <AnimatePresence exitBeforeEnter={false} initial={false}>
+        <Switch location={location} key={location.pathname}>
+            {children}
+        </Switch>
+    </AnimatePresence>;
+}
+
 
 export const App: React.FC<{ authStore?: AuthStore }> = observer((props) => {
     const {authStore} = useStores();
@@ -29,9 +41,9 @@ export const App: React.FC<{ authStore?: AuthStore }> = observer((props) => {
     }
 
     return <Router>
-        <Switch>
+        <AnimatedSwitch>
             <Route path="/" exact children={<NewsListScreen/>}/>
             <Route path="/news/:id" exact children={<NewsEntryScreen/>}/>
-        </Switch>
+        </AnimatedSwitch>
     </Router>;
 });

@@ -11,7 +11,6 @@ import {AppBarWithMenu, useHideMenuRef} from "../forms/AppBar";
 import {
     Avatar,
     Button,
-    Container,
     Dialog,
     DialogActions,
     DialogTitle,
@@ -30,6 +29,7 @@ import {StarButton} from "../forms/StarButton";
 import {FullScreenProgressWithDelay} from "../forms/util";
 import {FixedSizeList, ListChildComponentProps, ListOnScrollProps} from "react-window";
 import {useHeightObserver} from "../hooks/heightObserver";
+import {AnimatedPage} from "../forms/AnimatedPage";
 
 const useStyles = makeStyles(theme => ({
     progress: {
@@ -48,7 +48,8 @@ const useStyles = makeStyles(theme => ({
     list: {
         overflowX: "hidden",
         overflowY: "auto",
-        height: "calc(100vh - 64px)"
+        height: "calc(100vh - 64px)",
+        "-webkit-tap-highlight-color": "transparent"
     },
 
     row: {
@@ -123,7 +124,7 @@ export const NewsEntryList: React.FC<NewsEntryListProps> = observer(({onTitleCli
     };
 
     useEffect(() => {
-        if (entries.length !== 0 ) {
+        if (entries.length !== 0) {
             listRef.current?.scrollTo(uiStateStore.newsListScroll);
         }
     }, [entries, uiStateStore]);
@@ -172,6 +173,10 @@ export const NewsListScreen: React.FC = observer(() => {
     const hideMenus = useHideMenuRef();
 
     const newsEntryListRef = useRef<{ resetScroll: () => void } | null>(null);
+
+    useEffect(() => {
+        document.title = "pwarss";
+    }, []);
 
     useEffect(() => {
         if (newsStore.entries().length === 0) {
@@ -258,7 +263,7 @@ export const NewsListScreen: React.FC = observer(() => {
         <MenuItem key="mark-all-read" onClick={confirmReadAll}>Mark all read</MenuItem>
     ];
 
-    return (<Container disableGutters maxWidth={false}>
+    return (<AnimatedPage slide={false}>
             <AppBarWithMenu title="Title"
                             hideMenusRef={hideMenus}
                             leftMenu={leftMenu} rightMenu={rightMenu}
@@ -277,7 +282,7 @@ export const NewsListScreen: React.FC = observer(() => {
 
             {confirmDialog}
 
-        </Container>
+        </AnimatedPage>
     );
 });
 
