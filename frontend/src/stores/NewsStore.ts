@@ -1,7 +1,7 @@
 // Created by Konstantin Khvan on 7/23/18 2:43 PM
 
 import {action, IObservableArray, observable, toJS} from "mobx";
-import {IdType, NewsEntry, NullEntry} from "../model/NewsEntry";
+import {IdType, NewsEntry, newsEntryRead, NullEntry} from "../model/NewsEntry";
 import api from "../api";
 
 
@@ -96,7 +96,7 @@ export default class NewsStore {
 
     async readAll() {
         try {
-            const ids = this.cache.filter(entry => !entry.read).map(entry => entry.id);
+            const ids = this.cache.filter(entry => !newsEntryRead(entry)).map(entry => entry.id);
             if (ids.length <= 0) {
                 return;
             }

@@ -4,6 +4,8 @@ package com.pwarss.ttrs
 
 import com.pwarss.PwaRssProperties
 import com.pwarss.model.NewsEntry
+import com.pwarss.model.TAG_MARKED
+import com.pwarss.model.TAG_READ
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -20,9 +22,18 @@ class EntriesServiceTtrss(private val jdbcTemplate: NamedParameterJdbcTemplate, 
     val maxEntries = config.maxEntriesForRequest
 
     private val newsEntryMapper = RowMapper { rs, _ ->
+        val tags = mutableListOf<String>()
+
+        if (!rs.getBoolean("unread")) {
+            tags.add(TAG_READ)
+        }
+
+        if (rs.getBoolean("marked")) {
+            tags.add(TAG_MARKED)
+        }
+
         NewsEntry(rs.getLong("id"),
-                !rs.getBoolean("unread"),
-                rs.getBoolean("marked"),
+                tags,
                 rs.getString("link"),
                 rs.getString("title"),
                 rs.getDate("date"),

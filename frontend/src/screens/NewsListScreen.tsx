@@ -3,7 +3,7 @@
 import * as React from "react";
 import {MutableRefObject, useEffect, useRef, useState} from "react";
 import {observer} from "mobx-react";
-import {IdType} from "../model/NewsEntry";
+import {IdType, newsEntryRead} from "../model/NewsEntry";
 import {NEWS_FILTER} from "../stores/NewsStore";
 import {useHistory} from "react-router-dom";
 import {useStores} from "../hooks/stores";
@@ -138,7 +138,9 @@ export const NewsEntryList: React.FC<NewsEntryListProps> = observer(({onTitleCli
     const row = (props: ListChildComponentProps) => {
         const {index, style} = props;
 
-        const {id, title, read} = entries[index];
+        const entry = entries[index];
+        const {id, title} = entry;
+        const read = newsEntryRead(entry);
         const rowTitleClass = classes.title + (read ? "" : " unread");
 
         const onClick = () => {

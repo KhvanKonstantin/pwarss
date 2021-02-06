@@ -10,8 +10,7 @@ import java.sql.Date
  * News entry dto
  */
 data class NewsEntry(@JsonSerialize(using = ToStringSerializer::class) val id: Long,
-                     val read: Boolean,
-                     val starred: Boolean,
+                     val tags: List<String>,
                      val link: String,
                      val title: String,
                      val date: Date,
@@ -20,4 +19,8 @@ data class NewsEntry(@JsonSerialize(using = ToStringSerializer::class) val id: L
 /**
  * Null object for NewsEntry
  */
-val EMPTY_ENTRY = NewsEntry(1, true, false, "", "", Date(0), "")
+val EMPTY_ENTRY = NewsEntry(1, emptyList(), "", "", Date(0), "")
+
+
+val TAG_READ = "read"
+val TAG_MARKED = "marked"

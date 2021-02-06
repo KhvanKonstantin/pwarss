@@ -3,6 +3,9 @@
 package com.pwarss.ttrs
 
 import com.pwarss.PwarssApplication
+import com.pwarss.model.NewsEntry
+import com.pwarss.model.TAG_MARKED
+import com.pwarss.model.TAG_READ
 import com.pwarss.testutil.DefaultTestPropertiesSource
 import com.pwarss.testutil.TestProperties
 import org.assertj.core.api.Assertions.assertThat
@@ -103,3 +106,10 @@ class EntriesServiceTest {
         assertThat(allUnread).isTrue()
     }
 }
+
+
+private val NewsEntry.read
+    get() = this.tags.contains(TAG_READ)
+
+private val NewsEntry.starred
+    get() = this.tags.contains(TAG_MARKED)

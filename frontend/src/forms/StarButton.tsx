@@ -1,6 +1,6 @@
 // Created by Konstantin Khvan on 5/24/20, 1:15 AM
 
-import {IdType, NewsEntry} from "../model/NewsEntry";
+import {IdType, NewsEntry, newsEntryStarred} from "../model/NewsEntry";
 import * as React from "react";
 import {observer} from "mobx-react";
 import {useStores} from "../hooks/stores";
@@ -52,7 +52,7 @@ export const StarButton: React.FC<StarButtonProps> = observer((props) => {
     };
 
     const entry: NewsEntry | null = entryId ? newsStore.entryById(entryId) : null;
-    const starred = entry && entry.starred
+    const starred = entry && newsEntryStarred(entry)
 
     let starClass = starred ? classes.star + " starred" : classes.star;
     starClass = monochrome ? starClass + " monochrome" : starClass;
