@@ -5,6 +5,10 @@ package com.pwarss.security
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.pwarss.model.User
 import com.pwarss.ttrs.TtrssAuthenticationProvider
+import org.apache.tomcat.util.http.Rfc6265CookieProcessor
+import org.springframework.boot.web.embedded.tomcat.TomcatContextCustomizer
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory
+import org.springframework.boot.web.server.WebServerFactoryCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod.GET
@@ -119,6 +123,21 @@ class RequestBodyReaderAuthenticationFilter(val objectMapper: ObjectMapper) : Us
             throw e
         } catch (e: RuntimeException) {
             throw InternalAuthenticationServiceException("", e)
+        }
+    }
+}
+
+
+@Configuration
+class TomcatConfiguration {
+    @Bean
+    fun cookieProcessorCustomizer(): WebServerFactoryCustomizer<TomcatServletWebServerFactory> {
+        return WebServerFactoryCustomizer { tomcatServletWebServerFactory ->
+            tomcatServletWebServerFactory.addContextCustomizers(TomcatContextCustomizer { context ->
+                val processor = Rfc6265CookieProcessor()
+                processor.setSameSiteCookies("strict")
+                context.cookieProcessor = processor
+            })
         }
     }
 }
