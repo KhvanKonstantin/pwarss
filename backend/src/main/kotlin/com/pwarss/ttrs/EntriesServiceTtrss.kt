@@ -6,6 +6,7 @@ import com.pwarss.PwaRssProperties
 import com.pwarss.model.NewsEntry
 import com.pwarss.model.TAG_MARKED
 import com.pwarss.model.TAG_READ
+import com.pwarss.model.TAG_UNREAD
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -44,7 +45,10 @@ class EntriesServiceTtrss(private val jdbcTemplate: NamedParameterJdbcTemplate, 
         return findEntriesImpl(ownerId, 1, entryId = entryId).firstOrNull()
     }
 
-    fun findEntries(ownerId: Long, limit: Int, unread: Boolean? = null, marked: Boolean? = null): List<NewsEntry> {
+    fun findEntries(ownerId: Long, limit: Int, tags: List<String>? = null): List<NewsEntry> {
+        val unread = if (tags?.contains(TAG_UNREAD) ?: false) true else null
+        val marked = if (tags?.contains(TAG_MARKED) ?: false) true else null
+
         return findEntriesImpl(ownerId, limit, unread = unread, marked = marked)
     }
 
@@ -98,7 +102,7 @@ class EntriesServiceTtrss(private val jdbcTemplate: NamedParameterJdbcTemplate, 
     }
 
     @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-    fun findEntriesImpl(ownerId: Long, limit: Int, entryId: Long? = null,
+    private fun findEntriesImpl(ownerId: Long, limit: Int, entryId: Long? = null,
                         minId: Long? = null, maxId: Long? = null,
                         unread: Boolean? = null, marked: Boolean? = null): List<NewsEntry> {
 

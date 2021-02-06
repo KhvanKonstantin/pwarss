@@ -4,6 +4,8 @@ package com.pwarss.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.pwarss.model.EMPTY_ENTRY
+import com.pwarss.model.TAG_MARKED
+import com.pwarss.model.TAG_UNREAD
 import com.pwarss.testutil.DefaultTestPropertiesSource
 import com.pwarss.ttrs.EntriesServiceTtrss
 import com.pwarss.ttrs.UserServiceTtrss
@@ -66,7 +68,7 @@ class EntriesControllerTest : MockMvcAuthSupport {
         val (session, user) = doLogin()
 
         val entries = listOf(EMPTY_ENTRY)
-        Mockito.doReturn(entries).`when`(entriesService).findEntries(Mockito.eq(user.id), Mockito.anyInt(), Mockito.any(), Mockito.any())
+        Mockito.doReturn(entries).`when`(entriesService).findEntries(Mockito.eq(user.id), Mockito.anyInt(), Mockito.any())
 
         mockMvc.perform(get("/api/entries").session(session))
                 .andExpect(status().isOk)
@@ -78,9 +80,9 @@ class EntriesControllerTest : MockMvcAuthSupport {
         val (session, user) = doLogin()
 
         val entries = listOf(EMPTY_ENTRY)
-        Mockito.doReturn(entries).`when`(entriesService).findEntries(Mockito.eq(user.id), Mockito.anyInt(), Mockito.eq(true), Mockito.any())
+        Mockito.doReturn(entries).`when`(entriesService).findEntries(Mockito.eq(user.id), Mockito.anyInt(), Mockito.eq(listOf(TAG_UNREAD)))
 
-        mockMvc.perform(get("/api/entries").session(session).param("unread", "true"))
+        mockMvc.perform(get("/api/entries").session(session).param("tags", TAG_UNREAD))
                 .andExpect(status().isOk)
                 .andExpect(jsonMatcher(entries))
     }
@@ -90,9 +92,9 @@ class EntriesControllerTest : MockMvcAuthSupport {
         val (session, user) = doLogin()
 
         val entries = listOf(EMPTY_ENTRY)
-        Mockito.doReturn(entries).`when`(entriesService).findEntries(Mockito.eq(user.id), Mockito.anyInt(), Mockito.any(), Mockito.eq(true))
+        Mockito.doReturn(entries).`when`(entriesService).findEntries(Mockito.eq(user.id), Mockito.anyInt(), Mockito.eq(listOf(TAG_MARKED)))
 
-        mockMvc.perform(get("/api/entries").session(session).param("starred", "true"))
+        mockMvc.perform(get("/api/entries").session(session).param("tags", TAG_MARKED))
                 .andExpect(status().isOk)
                 .andExpect(jsonMatcher(entries))
     }

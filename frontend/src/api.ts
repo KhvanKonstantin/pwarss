@@ -1,7 +1,7 @@
 // Created by Konstantin Khvan on 7/11/18 2:05 PM
 
 import {User} from "./model/User";
-import {IdType, NewsEntry} from "./model/NewsEntry";
+import {IdType, NewsEntry, TAG_MARKED, TAG_UNREAD} from "./model/NewsEntry";
 
 export class GenericResponse {
     success: boolean = false
@@ -71,8 +71,8 @@ const api = {
     entry: {
         findById: (id: IdType) => getJson<NewsEntry>("entries/" + id),
         findAll: (limit: number) => getJson<Array<NewsEntry>>("entries", {limit}),
-        findUnread: (limit: number) => getJson<Array<NewsEntry>>("entries", {limit, unread: true}),
-        findStarred: (limit: number) => getJson<Array<NewsEntry>>("entries", {limit, starred: true}),
+        findUnread: (limit: number) => getJson<Array<NewsEntry>>("entries", {limit, tags: [TAG_UNREAD]}),
+        findStarred: (limit: number) => getJson<Array<NewsEntry>>("entries", {limit, tags: [TAG_MARKED]}),
         readAll: (ids: IdType[]) => postJson<GenericResponse>("entries/read", {ids}),
 
         starEntry: (id: IdType, star: boolean) => postJson<GenericResponseWithEntry>(`entries/${id}/star`, {star}),

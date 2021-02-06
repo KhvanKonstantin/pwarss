@@ -6,6 +6,7 @@ import com.pwarss.PwarssApplication
 import com.pwarss.model.NewsEntry
 import com.pwarss.model.TAG_MARKED
 import com.pwarss.model.TAG_READ
+import com.pwarss.model.TAG_UNREAD
 import com.pwarss.testutil.DefaultTestPropertiesSource
 import com.pwarss.testutil.TestProperties
 import org.assertj.core.api.Assertions.assertThat
@@ -50,8 +51,8 @@ class EntriesServiceTest {
     @Test
     fun runAllFinds() {
         entriesService.findEntries(ownerId, 50)
-        entriesService.findEntries(ownerId, 50, marked = true)
-        entriesService.findEntries(ownerId, 50, unread = true)
+        entriesService.findEntries(ownerId, 50, listOf(TAG_MARKED))
+        entriesService.findEntries(ownerId, 50, listOf(TAG_UNREAD))
     }
 
     @Test
@@ -87,7 +88,7 @@ class EntriesServiceTest {
     @Test
     @Ignore("This is destructive test disabled by default")
     fun readSingleEntry() {
-        val entries = entriesService.findEntries(ownerId, 10, unread = true)
+        val entries = entriesService.findEntries(ownerId, 10, listOf(TAG_UNREAD))
         val latestEntry = entries.first()
 
         entriesService.readEntry(ownerId, latestEntry.id, true)
@@ -97,7 +98,7 @@ class EntriesServiceTest {
     @Test
     @Ignore("This is destructive test disabled by default")
     fun readAll() {
-        val entries = entriesService.findEntries(ownerId, 10, unread = true)
+        val entries = entriesService.findEntries(ownerId, 10, listOf(TAG_UNREAD))
 
         entriesService.markRead(ownerId, entries.map { it.id })
 

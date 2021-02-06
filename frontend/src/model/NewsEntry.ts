@@ -23,6 +23,7 @@ export const NullEntry: NewsEntry = {
 
 
 export const TAG_READ = "read"
+export const TAG_UNREAD = "!read"
 export const TAG_MARKED = "marked"
 
 export function newsEntryStarred(entry: NewsEntry): boolean {

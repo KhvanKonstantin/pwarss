@@ -25,10 +25,9 @@ class EntriesController(private val entriesService: EntriesServiceTtrss) {
 
     @GetMapping("/entries")
     fun entries(@RequestParam("limit", required = false, defaultValue = "500") limit: Int,
-                @RequestParam("unread", required = false) unread: Boolean?,
-                @RequestParam("starred", required = false) starred: Boolean?,
+                @RequestParam("tags", required = false) tags: Array<String?>?,
                 user: User): ResponseEntity<List<NewsEntry>> {
-        val entries = entriesService.findEntries(user.id, limit, unread, marked = starred)
+        val entries = entriesService.findEntries(user.id, limit, tags?.filterNotNull())
 
         return ResponseEntity.ok(entries)
     }

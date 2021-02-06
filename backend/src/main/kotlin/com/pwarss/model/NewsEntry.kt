@@ -23,4 +23,5 @@ val EMPTY_ENTRY = NewsEntry(1, emptyList(), "", "", Date(0), "")
 
 
 val TAG_READ = "read"
+val TAG_UNREAD = "!read"
 val TAG_MARKED = "marked"
